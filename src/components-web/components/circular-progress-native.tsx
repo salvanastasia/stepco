@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 interface CircularProgressProps {
@@ -9,6 +10,8 @@ interface CircularProgressProps {
   onStartWalk: () => void;
 }
 
+type DisplayMode = 'steps' | 'distance';
+
 export default function CircularProgress({
   current,
   goal,
@@ -17,8 +20,40 @@ export default function CircularProgress({
   isWalking,
   onStartWalk,
 }: CircularProgressProps) {
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('steps');
+  
   const progress = Math.min(current / goal, 1);
   const filledDashes = Math.floor(progress * dashCount);
+  
+  // Calculate distance: average step length is 0.762 meters
+  const meters = current * 0.762;
+  const kilometers = meters / 1000;
+  
+  // Toggle display mode
+  const toggleDisplayMode = () => {
+    setDisplayMode(prev => prev === 'steps' ? 'distance' : 'steps');
+  };
+  
+  // Format display value and label
+  const getDisplayValue = () => {
+    if (displayMode === 'steps') {
+      return current.toLocaleString('de-DE');
+    } else {
+      if (meters < 1000) {
+        return Math.round(meters).toLocaleString('de-DE');
+      } else {
+        return kilometers.toFixed(2).replace('.', ',');
+      }
+    }
+  };
+  
+  const getDisplayLabel = () => {
+    if (displayMode === 'steps') {
+      return 'steps';
+    } else {
+      return meters < 1000 ? 'meters' : 'kilometers';
+    }
+  };
 
   // Create array of dashes positioned in a circle
   const dashes = Array.from({ length: dashCount }, (_, i) => {
@@ -57,12 +92,16 @@ export default function CircularProgress({
   return (
     <View style={styles.container}>
       <View style={[styles.progressContainer, { width: radius * 2 + 100, height: radius * 2 + 100 }]}>
-        <View style={styles.centerContent}>
+        <TouchableOpacity 
+          style={styles.centerContent}
+          onPress={toggleDisplayMode}
+          activeOpacity={0.7}
+        >
           <Text style={styles.stepsCount}>
-            {current.toLocaleString('de-DE')}
+            {getDisplayValue()}
           </Text>
-          <Text style={styles.stepsLabel}>steps</Text>
-        </View>
+          <Text style={styles.stepsLabel}>{getDisplayLabel()}</Text>
+        </TouchableOpacity>
         {dashes}
       </View>
       
