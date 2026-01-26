@@ -1,18 +1,28 @@
 import { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, PanResponder, Alert, Platform } from 'react-native';
+import { View, StyleSheet, PanResponder, Alert, Platform, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Pedometer } from 'expo-sensors';
+import { useFonts, Archivo_400Regular, Archivo_600SemiBold, Archivo_700Bold } from '@expo-google-fonts/archivo';
+import { JetBrainsMono_400Regular, JetBrainsMono_500Medium, JetBrainsMono_600SemiBold } from '@expo-google-fonts/jetbrains-mono';
 import CircularProgress from './src/components-web/components/circular-progress-native';
 import BottomNav from './src/components-web/components/bottom-nav-native';
 import MapView from './src/components-web/components/map-view-native';
 import ProfileView from './src/components-web/components/profile-view-native';
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Archivo_400Regular,
+    Archivo_600SemiBold,
+    Archivo_700Bold,
+    JetBrainsMono_400Regular,
+    JetBrainsMono_500Medium,
+    JetBrainsMono_600SemiBold,
+  });
+
   const [steps, setSteps] = useState(0);
   const goal = 10000;
   const [currentPage, setCurrentPage] = useState<'home' | 'map' | 'profile'>('home');
   const [isWalking, setIsWalking] = useState(false);
-  const [mapInteractionEnabled, setMapInteractionEnabled] = useState(false);
   const [isPedometerAvailable, setIsPedometerAvailable] = useState(false);
   
   const currentPageRef = useRef(currentPage);
@@ -103,56 +113,38 @@ export default function App() {
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: (evt) => {
-        const touchCount = evt.nativeEvent.touches.length;
-        const page = currentPageRef.current;
-        
-        // If we're on map and 2+ fingers, enable map interaction
-        if (page === 'map' && touchCount >= 2) {
-          setMapInteractionEnabled(true);
-          return false; // Don't capture, let map handle it
-        }
-        
-        // Reset map interaction if less than 2 fingers
-        if (page === 'map') {
-          setMapInteractionEnabled(false);
-        }
-        
-        // Only capture if it's a single touch (1 finger)
-        return touchCount === 1;
-      },
+      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponderCapture: () => false,
       onMoveShouldSetPanResponder: (evt, gestureState) => {
-        const touchCount = evt.nativeEvent.touches.length;
-        const page = currentPageRef.current;
-        
-        // If 2+ fingers on map, don't capture
-        if (page === 'map' && touchCount >= 2) {
-          setMapInteractionEnabled(true);
-          return false;
-        }
-        
-        // Capture if it's a single touch and horizontal movement
-        const isSingleTouch = touchCount === 1;
-        const isHorizontalSwipe = Math.abs(gestureState.dx) > Math.abs(gestureState.dy);
-        return isSingleTouch && isHorizontalSwipe;
+        // Capture if horizontal movement is greater than vertical (with small threshold)
+        const isHorizontalSwipe = Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && Math.abs(gestureState.dx) > 5;
+        return isHorizontalSwipe;
+      },
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
+        // Aggressively capture horizontal swipes from children
+        const isHorizontalSwipe = Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && Math.abs(gestureState.dx) > 10;
+        return isHorizontalSwipe;
+      },
+      onPanResponderGrant: () => {
+        // Gesture has started
+      },
+      onPanResponderMove: () => {
+        // Track movement (no action needed, just tracking)
       },
       onPanResponderRelease: (evt, gestureState) => {
         const { dx, dy } = gestureState;
-        const page = currentPageRef.current;
         
-        // Reset map interaction
-        if (page === 'map') {
-          setTimeout(() => setMapInteractionEnabled(false), 50);
-        }
-        
-        // Only trigger swipe if horizontal movement is greater than vertical and it's a single touch
-        if (evt.nativeEvent.changedTouches.length === 1 && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+        // Trigger swipe if horizontal movement is greater than vertical and exceeds threshold
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
           if (dx < 0) {
             handleSwipe('left');
           } else {
             handleSwipe('right');
           }
         }
+      },
+      onPanResponderTerminate: () => {
+        // Another component has taken over the gesture
       },
     })
   ).current;
@@ -187,6 +179,14 @@ export default function App() {
     }
   };
 
+  if (!fontsLoaded) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
       <StatusBar style="light" />
@@ -200,7 +200,7 @@ export default function App() {
         />
       )}
       
-      {currentPage === 'map' && <MapView mapInteractionEnabled={mapInteractionEnabled} />}
+      {currentPage === 'map' && <MapView />}
       
       {currentPage === 'profile' && <ProfileView />}
       
@@ -213,5 +213,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1a1a1a',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: 'JetBrainsMono_400Regular',
   },
 });

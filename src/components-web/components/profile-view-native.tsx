@@ -54,6 +54,8 @@ export default function ProfileView() {
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
       >
         {stepHistory.map((record) => {
           const percentage = Math.round((record.steps / dailyGoal) * 100);
@@ -126,7 +128,7 @@ const styles = StyleSheet.create({
   title: {
     color: '#fff',
     fontSize: 24,
-    fontFamily: 'monospace',
+    fontFamily: 'Archivo_700Bold',
   },
   settingsButton: {
     padding: 8,
@@ -157,13 +159,13 @@ const styles = StyleSheet.create({
   },
   recordDate: {
     color: '#fff',
-    fontFamily: 'monospace',
+    fontFamily: 'JetBrainsMono_500Medium',
     fontSize: 14,
     marginBottom: 4,
   },
   recordSteps: {
     color: '#999',
-    fontFamily: 'monospace',
+    fontFamily: 'JetBrainsMono_400Regular',
     fontSize: 12,
   },
   recordRight: {
@@ -173,7 +175,7 @@ const styles = StyleSheet.create({
   },
   percentage: {
     fontSize: 14,
-    fontFamily: 'monospace',
+    fontFamily: 'JetBrainsMono_600SemiBold',
     color: '#999',
   },
   percentageComplete: {

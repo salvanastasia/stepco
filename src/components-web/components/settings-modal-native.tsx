@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: '#bbb',
     fontSize: 12,
-    fontFamily: 'monospace',
+    fontFamily: 'JetBrainsMono_400Regular',
     marginBottom: 16,
   },
   stepsRow: {
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   label: {
     color: '#bbb',
     fontSize: 14,
-    fontFamily: 'monospace',
+    fontFamily: 'JetBrainsMono_400Regular',
   },
   valueBox: {
     backgroundColor: '#2a2a2a',
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   valueText: {
     color: '#fff',
     fontSize: 14,
-    fontFamily: 'monospace',
+    fontFamily: 'JetBrainsMono_600SemiBold',
   },
   sliderContainer: {
     marginBottom: 16,
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   labelText: {
     color: '#bbb',
     fontSize: 12,
-    fontFamily: 'monospace',
+    fontFamily: 'JetBrainsMono_400Regular',
   },
   unitSection: {
     marginTop: 16,
@@ -226,6 +226,6 @@ const styles = StyleSheet.create({
   unitButtonText: {
     color: '#fff',
     fontSize: 14,
-    fontFamily: 'monospace',
+    fontFamily: 'JetBrainsMono_500Medium',
   },
 });

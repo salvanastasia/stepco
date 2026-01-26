@@ -140,13 +140,13 @@ const styles = StyleSheet.create({
   stepsCount: {
     fontSize: 48,
     color: '#fff',
-    fontWeight: '400',
+    fontFamily: 'Archivo_700Bold',
   },
   stepsLabel: {
     fontSize: 14,
     color: '#999',
     marginTop: 8,
-    fontFamily: 'monospace',
+    fontFamily: 'JetBrainsMono_400Regular',
   },
   dash: {
     position: 'absolute',
@@ -162,8 +162,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#1a1a1a',
     fontSize: 14,
-    fontWeight: '500',
-    fontFamily: 'monospace',
+    fontFamily: 'JetBrainsMono_600SemiBold',
     letterSpacing: 0.5,
   },
 });

@@ -8,11 +8,7 @@ interface Position {
   longitude: number;
 }
 
-interface MapViewComponentProps {
-  mapInteractionEnabled: boolean;
-}
-
-export default function MapViewComponent({ mapInteractionEnabled }: MapViewComponentProps) {
+export default function MapViewComponent() {
   const [position, setPosition] = useState<Position | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pathCoords, setPathCoords] = useState<Position[]>([]);
@@ -90,7 +86,7 @@ export default function MapViewComponent({ mapInteractionEnabled }: MapViewCompo
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} pointerEvents="box-none">
       <MapView
         style={styles.map}
         provider={PROVIDER_DEFAULT}
@@ -102,12 +98,13 @@ export default function MapViewComponent({ mapInteractionEnabled }: MapViewCompo
         customMapStyle={darkMapStyle}
         showsUserLocation={false}
         showsMyLocationButton={false}
-        scrollEnabled={mapInteractionEnabled}
-        zoomEnabled={mapInteractionEnabled}
-        rotateEnabled={mapInteractionEnabled}
-        pitchEnabled={mapInteractionEnabled}
+        scrollEnabled={false}
+        zoomEnabled={false}
+        rotateEnabled={false}
+        pitchEnabled={false}
         minZoomLevel={10}
         maxZoomLevel={20}
+        pointerEvents="none"
       >
         {position && (
           <Marker
@@ -121,8 +118,8 @@ export default function MapViewComponent({ mapInteractionEnabled }: MapViewCompo
         {pathCoords.length > 1 && (
           <Polyline
             coordinates={pathCoords}
-            strokeColor="#fff"
-            strokeWidth={4}
+            strokeColor="#ff6600"
+            strokeWidth={5}
             lineJoin="round"
             lineCap="round"
           />
@@ -141,42 +138,106 @@ export default function MapViewComponent({ mapInteractionEnabled }: MapViewCompo
         </Text>
       </View>
       
-      {!mapInteractionEnabled && (
-        <View style={styles.hint} pointerEvents="none">
-          <Text style={styles.hintText}>Use 2 fingers to interact with map</Text>
-        </View>
-      )}
     </View>
   );
 }
 
 const darkMapStyle = [
+  // Base map - very dark
   {
     elementType: 'geometry',
-    stylers: [{ color: '#1a1a1a' }],
+    stylers: [{ color: '#0d0d0d' }],
+  },
+  {
+    elementType: 'labels.icon',
+    stylers: [{ visibility: 'off' }],
   },
   {
     elementType: 'labels.text.fill',
-    stylers: [{ color: '#999' }],
+    stylers: [{ color: '#666666' }],
   },
   {
     elementType: 'labels.text.stroke',
-    stylers: [{ color: '#1a1a1a' }],
+    stylers: [{ color: '#0d0d0d' }],
   },
+  // Roads - dark grey
   {
     featureType: 'road',
     elementType: 'geometry',
-    stylers: [{ color: '#2a2a2a' }],
+    stylers: [{ color: '#1a1a1a' }],
   },
   {
     featureType: 'road',
     elementType: 'geometry.stroke',
-    stylers: [{ color: '#333' }],
+    stylers: [{ color: '#2a2a2a' }],
   },
+  {
+    featureType: 'road.highway',
+    elementType: 'geometry',
+    stylers: [{ color: '#262626' }],
+  },
+  {
+    featureType: 'road.highway',
+    elementType: 'geometry.stroke',
+    stylers: [{ color: '#333333' }],
+  },
+  {
+    featureType: 'road.arterial',
+    elementType: 'geometry',
+    stylers: [{ color: '#1f1f1f' }],
+  },
+  // Water - very dark
   {
     featureType: 'water',
     elementType: 'geometry',
-    stylers: [{ color: '#0a0a0a' }],
+    stylers: [{ color: '#000000' }],
+  },
+  {
+    featureType: 'water',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#404040' }],
+  },
+  // Parks/landscape - dark grey
+  {
+    featureType: 'landscape',
+    elementType: 'geometry',
+    stylers: [{ color: '#0d0d0d' }],
+  },
+  {
+    featureType: 'landscape.natural',
+    elementType: 'geometry',
+    stylers: [{ color: '#121212' }],
+  },
+  // POI - minimal visibility
+  {
+    featureType: 'poi',
+    elementType: 'geometry',
+    stylers: [{ color: '#1a1a1a' }],
+  },
+  {
+    featureType: 'poi.park',
+    elementType: 'geometry',
+    stylers: [{ color: '#0f0f0f' }],
+  },
+  // Transit - very subtle
+  {
+    featureType: 'transit',
+    elementType: 'geometry',
+    stylers: [{ color: '#1a1a1a' }],
+  },
+  // Administrative - dark borders
+  {
+    featureType: 'administrative',
+    elementType: 'geometry.stroke',
+    stylers: [{ color: '#2a2a2a' }],
+  },
+  {
+    featureType: 'administrative.land_parcel',
+    stylers: [{ visibility: 'off' }],
+  },
+  {
+    featureType: 'administrative.neighborhood',
+    stylers: [{ visibility: 'off' }],
   },
 ];
 
@@ -197,55 +258,46 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     marginBottom: 8,
+    fontFamily: 'Archivo_600SemiBold',
   },
   errorSubtext: {
     color: '#999',
     fontSize: 14,
+    fontFamily: 'JetBrainsMono_400Regular',
   },
   marker: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#4285F4',
-    borderWidth: 2,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#ff6600',
+    borderWidth: 3,
     borderColor: '#fff',
+    shadowColor: '#ff6600',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 5,
   },
   infoBox: {
     position: 'absolute',
     top: 72,
     left: 32,
-    backgroundColor: '#2a2a2a',
+    backgroundColor: '#0d0d0d',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#3a3a3a',
+    borderColor: '#1a1a1a',
   },
   infoTitle: {
     color: '#fff',
     fontSize: 14,
-    fontFamily: 'monospace',
+    fontFamily: 'JetBrainsMono_500Medium',
   },
   infoCoords: {
     color: '#999',
     fontSize: 12,
     marginTop: 4,
-    fontFamily: 'monospace',
-  },
-  hint: {
-    position: 'absolute',
-    bottom: 80,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  hintText: {
-    color: '#999',
-    fontSize: 12,
-    fontFamily: 'monospace',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
+    fontFamily: 'JetBrainsMono_400Regular',
   },
 });
