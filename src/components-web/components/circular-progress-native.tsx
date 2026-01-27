@@ -90,12 +90,16 @@ export default function CircularProgress({
   });
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.progressContainer, { width: radius * 2 + 100, height: radius * 2 + 100 }]}>
+    <View style={styles.container} pointerEvents="box-none">
+      <View 
+        style={[styles.progressContainer, { width: radius * 2 + 100, height: radius * 2 + 100 }]}
+        pointerEvents="box-none"
+      >
         <TouchableOpacity 
           style={styles.centerContent}
           onPress={toggleDisplayMode}
           activeOpacity={0.7}
+          pointerEvents="auto"
         >
           <Text style={styles.stepsCount}>
             {getDisplayValue()}
@@ -109,6 +113,7 @@ export default function CircularProgress({
         style={styles.button}
         onPress={onStartWalk}
         activeOpacity={0.8}
+        pointerEvents="auto"
       >
         <Text style={styles.buttonText}>
           {isWalking ? 'WALKING...' : 'START WALK'}

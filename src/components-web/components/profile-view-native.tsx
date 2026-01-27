@@ -38,24 +38,34 @@ export default function ProfileView() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} pointerEvents="box-none">
       {/* Header */}
-      <View style={styles.header}>
+      <View style={styles.header} pointerEvents="box-none">
         <Text style={styles.title}>Activity</Text>
         <TouchableOpacity
           onPress={() => setShowSettings(!showSettings)}
           style={styles.settingsButton}
+          pointerEvents="auto"
         >
           <Text style={styles.settingsIcon}>⚙️</Text>
         </TouchableOpacity>
       </View>
 
-      {/* History List */}
+      {/* 
+        History List ScrollView
+        
+        directionalLockEnabled: Locks to vertical scroll after user starts scrolling
+        This allows horizontal swipes to work for page navigation
+        while preserving vertical scroll functionality
+      */}
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
+        directionalLockEnabled={true}
+        alwaysBounceVertical={true}
+        alwaysBounceHorizontal={false}
       >
         {stepHistory.map((record) => {
           const percentage = Math.round((record.steps / dailyGoal) * 100);
