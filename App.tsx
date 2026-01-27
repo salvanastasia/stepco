@@ -24,11 +24,18 @@ export default function App() {
 
   const { width: screenWidth } = useWindowDimensions();
 
+  // Step record interface
+  interface StepRecord {
+    date: string;
+    steps: number;
+  }
+
   const [steps, setSteps] = useState(0);
   const goal = 10000;
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [isWalking, setIsWalking] = useState(false);
   const [isPedometerAvailable, setIsPedometerAvailable] = useState(false);
+  const [stepHistory, setStepHistory] = useState<StepRecord[]>([]);
   
   const currentPageRef = useRef(currentPage);
   const walkStartTimeRef = useRef<Date | null>(null);
@@ -188,12 +195,11 @@ export default function App() {
   const animateToPage = (page: PageType, index: number) => {
     setCurrentPage(page);
     
-    // Animate horizontal slide with spring physics
-    Animated.spring(translateX, {
+    // Use timing animation for guaranteed completion (more reliable than spring)
+    Animated.timing(translateX, {
       toValue: -index * screenWidth,
+      duration: 300,
       useNativeDriver: true,
-      speed: 14,
-      bounciness: 4,
     }).start();
   };
 
@@ -203,12 +209,11 @@ export default function App() {
    */
   useEffect(() => {
     const index = pages.indexOf(currentPage);
-    // Sync animation with page state
-    Animated.spring(translateX, {
+    // Sync animation with page state (when page changes programmatically)
+    Animated.timing(translateX, {
       toValue: -index * screenWidth,
+      duration: 300,
       useNativeDriver: true,
-      speed: 14,
-      bounciness: 4,
     }).start();
   }, [currentPage, screenWidth]);
 
@@ -258,67 +263,51 @@ export default function App() {
       },
       
       /**
-       * LIVE DRAG PREVIEW: Track continuous movement
-       * 
-       * Shows next/previous page preview as user drags
-       * Applies boundary constraints to prevent over-scrolling
+       * Should this responder be released to another responder?
+       * Return false to NEVER release (prevents MapView from stealing gesture)
        */
-      onPanResponderMove: (evt, gestureState) => {
-        const currentIndex = pages.indexOf(currentPageRef.current);
-        const dragOffset = gestureState.dx;
-        
-        // Calculate target position with drag offset
-        let targetPosition = -currentIndex * screenWidth + dragOffset;
-        
-        // BOUNDARY CONSTRAINTS:
-        // - Don't drag past first screen (Home)
-        // - Don't drag past last screen (Stats)
-        const minPosition = -(pages.length - 1) * screenWidth; // -2 * screenWidth for Stats
-        const maxPosition = 0; // 0 for Home
-        
-        // Clamp position within bounds with rubber-band effect
-        if (targetPosition > maxPosition) {
-          // Trying to drag right from Home → apply resistance
-          const overflow = targetPosition - maxPosition;
-          targetPosition = maxPosition + overflow * 0.3; // 30% resistance
-        } else if (targetPosition < minPosition) {
-          // Trying to drag left from Stats → apply resistance
-          const overflow = targetPosition - minPosition;
-          targetPosition = minPosition + overflow * 0.3; // 30% resistance
-        }
-        
-        // Update translateX for live preview
-        translateX.setValue(targetPosition);
+      onPanResponderTerminationRequest: () => false,
+      
+      /**
+       * Track continuous movement
+       * No live preview to avoid conflicts with release animation
+       */
+      onPanResponderMove: () => {
+        // Not using live preview to ensure smooth completion
       },
       
       /**
        * USER RELEASED FINGER: Execute navigation if swipe is valid
        * 
        * SWIPE VALIDATION:
-       * - Minimum distance: 50px (prevents accidental swipes)
+       * - Check distance OR velocity
+       * - Distance: minimum 40px (lowered from 50px)
+       * - Velocity: minimum 0.3 (quick flick)
        * - Must be more horizontal than vertical
-       * - Direction: dx < 0 = left swipe, dx > 0 = right swipe
        */
       onPanResponderRelease: (evt, gestureState) => {
-        const { dx, dy } = gestureState;
+        const { dx, dy, vx } = gestureState;
         
-        // Check if swipe distance exceeds threshold (50px) and is primarily horizontal
-        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+        // Determine if swipe is valid based on distance OR velocity
+        const isHorizontal = Math.abs(dx) > Math.abs(dy);
+        const hasMinDistance = Math.abs(dx) > 40;  // Lowered threshold
+        const hasMinVelocity = Math.abs(vx) > 0.3; // Quick flick detection
+        
+        if (isHorizontal && (hasMinDistance || hasMinVelocity)) {
           if (dx < 0) {
-            // Swiped left (finger moved left) → go to next page
+            // Swiped left → go to next page
             handleSwipe('left');
           } else {
-            // Swiped right (finger moved right) → go to previous page
+            // Swiped right → go to previous page
             handleSwipe('right');
           }
         } else {
-          // Swipe too short or too vertical → snap back to current page
+          // Invalid swipe → snap back to current position
           const currentIndex = pages.indexOf(currentPage);
-          Animated.spring(translateX, {
+          Animated.timing(translateX, {
             toValue: -currentIndex * screenWidth,
+            duration: 200,
             useNativeDriver: true,
-            speed: 14,
-            bounciness: 4,
           }).start();
         }
       },
@@ -328,13 +317,12 @@ export default function App() {
        * (e.g., ScrollView took over for vertical scroll)
        */
       onPanResponderTerminate: () => {
-        // Snap back to current page
+        // Snap back to current page (should rarely happen)
         const currentIndex = pages.indexOf(currentPage);
-        Animated.spring(translateX, {
+        Animated.timing(translateX, {
           toValue: -currentIndex * screenWidth,
+          duration: 200,
           useNativeDriver: true,
-          speed: 14,
-          bounciness: 4,
         }).start();
       },
     })
@@ -368,6 +356,55 @@ export default function App() {
       // Use simulation mode
       setIsWalking(true);
     }
+  };
+
+  /**
+   * STOP WALK & SAVE RECORD
+   * 
+   * When user stops walking:
+   * 1. Stop the pedometer tracking
+   * 2. Save current steps to history with today's date
+   * 3. Reset steps counter to 0
+   */
+  const stopWalk = () => {
+    // Stop walking
+    setIsWalking(false);
+    
+    // Save the walk to history (only if steps > 0)
+    if (steps > 0) {
+      const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+      
+      // Check if there's already a record for today
+      const existingRecordIndex = stepHistory.findIndex(record => record.date === today);
+      
+      if (existingRecordIndex >= 0) {
+        // Update existing record (add steps to today's total)
+        const updatedHistory = [...stepHistory];
+        updatedHistory[existingRecordIndex] = {
+          date: today,
+          steps: updatedHistory[existingRecordIndex].steps + steps,
+        };
+        setStepHistory(updatedHistory);
+      } else {
+        // Create new record for today
+        const newRecord: StepRecord = {
+          date: today,
+          steps: steps,
+        };
+        // Add to beginning of array (most recent first)
+        setStepHistory([newRecord, ...stepHistory]);
+      }
+      
+      // Show success message
+      Alert.alert(
+        'Walk Saved!',
+        `${steps.toLocaleString()} steps have been saved to your activity history.`,
+        [{ text: 'OK' }]
+      );
+    }
+    
+    // Reset steps counter
+    setSteps(0);
   };
 
   if (!fontsLoaded) {
@@ -416,6 +453,7 @@ export default function App() {
             goal={goal} 
             isWalking={isWalking}
             onStartWalk={startWalk}
+            onStopWalk={stopWalk}
           />
         </View>
 
@@ -433,7 +471,7 @@ export default function App() {
           pointerEvents="box-none" allows swipes while preserving scroll in ProfileView
         */}
         <View style={[styles.screen, { width: screenWidth }]} pointerEvents="box-none">
-          <ProfileView />
+          <ProfileView stepHistory={stepHistory} dailyGoal={goal} />
         </View>
       </Animated.View>
       

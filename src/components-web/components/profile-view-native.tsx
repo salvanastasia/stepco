@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { Settings } from 'lucide-react-native';
 import SettingsModal from './settings-modal-native';
 
 interface StepRecord {
@@ -7,25 +8,20 @@ interface StepRecord {
   steps: number;
 }
 
-export default function ProfileView() {
-  const [showSettings, setShowSettings] = useState(false);
-  const [dailyGoal, setDailyGoal] = useState(10000);
-  const [unit, setUnit] = useState<'steps' | 'km'>('steps');
+interface ProfileViewProps {
+  stepHistory: StepRecord[];
+  dailyGoal: number;
+}
 
-  const stepHistory: StepRecord[] = [
-    { date: '2026-01-26', steps: 6847 },
-    { date: '2026-01-25', steps: 12453 },
-    { date: '2026-01-24', steps: 9876 },
-    { date: '2026-01-23', steps: 8234 },
-    { date: '2026-01-22', steps: 11290 },
-    { date: '2026-01-21', steps: 7654 },
-    { date: '2026-01-20', steps: 10234 },
-  ];
+export default function ProfileView({ stepHistory, dailyGoal }: ProfileViewProps) {
+  const [showSettings, setShowSettings] = useState(false);
+  const [unit, setUnit] = useState<'steps' | 'km'>('steps');
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    const today = new Date('2026-01-26');
-    const yesterday = new Date('2026-01-25');
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
     
     if (date.toDateString() === today.toDateString()) return 'Today';
     if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
@@ -47,7 +43,7 @@ export default function ProfileView() {
           style={styles.settingsButton}
           pointerEvents="auto"
         >
-          <Text style={styles.settingsIcon}>⚙️</Text>
+          <Settings size={24} color="#fff" strokeWidth={2} />
         </TouchableOpacity>
       </View>
 
@@ -67,7 +63,13 @@ export default function ProfileView() {
         alwaysBounceVertical={true}
         alwaysBounceHorizontal={false}
       >
-        {stepHistory.map((record) => {
+        {stepHistory.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyText}>No walks recorded yet</Text>
+            <Text style={styles.emptySubtext}>Start a walk to see your activity here</Text>
+          </View>
+        ) : (
+          stepHistory.map((record) => {
           const percentage = Math.round((record.steps / dailyGoal) * 100);
           const isComplete = record.steps >= dailyGoal;
           
@@ -106,7 +108,8 @@ export default function ProfileView() {
               </View>
             </View>
           );
-        })}
+        })
+        )}
       </ScrollView>
       
       {/* Settings Modal */}
@@ -114,7 +117,7 @@ export default function ProfileView() {
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
         dailyGoal={dailyGoal}
-        onGoalChange={setDailyGoal}
+        onGoalChange={() => {}} // TODO: Implement goal change in App.tsx
         unit={unit}
         onUnitChange={setUnit}
       />
@@ -143,9 +146,6 @@ const styles = StyleSheet.create({
   settingsButton: {
     padding: 8,
     borderRadius: 8,
-  },
-  settingsIcon: {
-    fontSize: 24,
   },
   scrollView: {
     flex: 1,
@@ -201,5 +201,21 @@ const styles = StyleSheet.create({
   progressBar: {
     height: '100%',
     borderRadius: 4,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 64,
+  },
+  emptyText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Archivo_600SemiBold',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    color: '#999',
+    fontSize: 14,
+    fontFamily: 'JetBrainsMono_400Regular',
   },
 });

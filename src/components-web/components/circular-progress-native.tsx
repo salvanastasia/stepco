@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Square } from 'lucide-react-native';
 
 interface CircularProgressProps {
   current: number;
@@ -8,6 +9,7 @@ interface CircularProgressProps {
   dashCount?: number;
   isWalking: boolean;
   onStartWalk: () => void;
+  onStopWalk?: () => void;
 }
 
 type DisplayMode = 'steps' | 'distance';
@@ -19,6 +21,7 @@ export default function CircularProgress({
   dashCount = 60,
   isWalking,
   onStartWalk,
+  onStopWalk,
 }: CircularProgressProps) {
   const [displayMode, setDisplayMode] = useState<DisplayMode>('steps');
   
@@ -109,16 +112,29 @@ export default function CircularProgress({
         {dashes}
       </View>
       
-      <TouchableOpacity 
-        style={styles.button}
-        onPress={onStartWalk}
-        activeOpacity={0.8}
-        pointerEvents="auto"
-      >
-        <Text style={styles.buttonText}>
-          {isWalking ? 'WALKING...' : 'START WALK'}
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity 
+          style={styles.button}
+          onPress={onStartWalk}
+          activeOpacity={0.8}
+          pointerEvents="auto"
+        >
+          <Text style={styles.buttonText}>
+            {isWalking ? 'WALKING...' : 'START WALK'}
+          </Text>
+        </TouchableOpacity>
+        
+        {isWalking && (
+          <TouchableOpacity 
+            style={styles.circularButton}
+            onPress={onStopWalk}
+            activeOpacity={0.8}
+            pointerEvents="auto"
+          >
+            <Square size={18} color="#1a1a1a" strokeWidth={0} fill="#1a1a1a" />
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 }
@@ -158,6 +174,11 @@ const styles = StyleSheet.create({
     height: 32,
     width: 2,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   button: {
     backgroundColor: '#fff',
     paddingHorizontal: 32,
@@ -169,5 +190,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'JetBrainsMono_600SemiBold',
     letterSpacing: 0.5,
+  },
+  circularButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
