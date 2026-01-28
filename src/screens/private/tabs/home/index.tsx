@@ -1,10 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, PanResponder, Alert, Platform, Animated, useWindowDimensions } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  PanResponder,
+  Alert,
+  Platform,
+  Animated,
+  useWindowDimensions,
+} from 'react-native';
 import { Pedometer } from 'expo-sensors';
-import CircularProgress from '../../components-web/components/circular-progress-native';
-import BottomNav from '../../components-web/components/bottom-nav-native';
-import MapView from '../../components-web/components/map-view-native';
-import ProfileView from '../../components-web/components/profile-view-native';
+import CircularProgress from '../../../../components-web/components/circular-progress-native';
+import MapView from 'react-native-maps';
+import ProfileView from '../../../../components-web/components/profile-view-native';
+import BottomNav from '../../../../components-web/components/bottom-nav-native';
 
 type PageType = 'home' | 'map' | 'stats';
 
@@ -13,13 +21,14 @@ interface StepRecord {
   steps: number;
 }
 
+const goal = 10000;
+
 export default function HomeScreen() {
   const { width: screenWidth } = useWindowDimensions();
 
   const [steps, setSteps] = useState(0);
-  const goal = 10000;
-  const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [isWalking, setIsWalking] = useState(false);
+  const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [isPedometerAvailable, setIsPedometerAvailable] = useState(false);
   const [stepHistory, setStepHistory] = useState<StepRecord[]>([]);
 
@@ -61,7 +70,7 @@ export default function HomeScreen() {
     const startTracking = async () => {
       if (isPedometerAvailable) {
         try {
-          subscription = Pedometer.watchStepCount(result => {
+          subscription = Pedometer.watchStepCount((result) => {
             if (!hasInitialValue) {
               initialStepCount = result.steps;
               hasInitialValue = true;
@@ -86,7 +95,7 @@ export default function HomeScreen() {
 
     const startSimulation = () => {
       const intervalId = setInterval(() => {
-        setSteps(prev => {
+        setSteps((prev) => {
           if (prev >= goal) {
             setIsWalking(false);
             return prev;
@@ -96,7 +105,7 @@ export default function HomeScreen() {
       }, 100);
 
       subscription = {
-        remove: () => clearInterval(intervalId)
+        remove: () => clearInterval(intervalId),
       };
     };
 
@@ -145,11 +154,13 @@ export default function HomeScreen() {
       onStartShouldSetPanResponder: () => true,
       onStartShouldSetPanResponderCapture: () => false,
       onMoveShouldSetPanResponder: (evt, gestureState) => {
-        const isHorizontalSwipe = Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && Math.abs(gestureState.dx) > 5;
+        const isHorizontalSwipe =
+          Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && Math.abs(gestureState.dx) > 5;
         return isHorizontalSwipe;
       },
       onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
-        const isHorizontalSwipe = Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && Math.abs(gestureState.dx) > 10;
+        const isHorizontalSwipe =
+          Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && Math.abs(gestureState.dx) > 10;
         return isHorizontalSwipe;
       },
       onPanResponderGrant: () => {},
@@ -222,7 +233,7 @@ export default function HomeScreen() {
     if (steps > 0) {
       const today = new Date().toISOString().split('T')[0];
 
-      const existingRecordIndex = stepHistory.findIndex(record => record.date === today);
+      const existingRecordIndex = stepHistory.findIndex((record) => record.date === today);
 
       if (existingRecordIndex >= 0) {
         const updatedHistory = [...stepHistory];
@@ -279,10 +290,13 @@ export default function HomeScreen() {
         </View>
       </Animated.View>
 
-      <BottomNav currentPage={currentPage} onPageChange={(page) => {
-        const index = pages.indexOf(page);
-        animateToPage(page, index);
-      }} />
+      <BottomNav
+        currentPage={currentPage}
+        onPageChange={(page) => {
+          const index = pages.indexOf(page);
+          animateToPage(page, index);
+        }}
+      />
     </View>
   );
 }
