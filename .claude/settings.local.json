@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bunx expo install:*)",
+      "Bash(bun add:*)"
+    ]
+  }
+}
