@@ -1,45 +1,30 @@
-import { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Square } from 'lucide-react-native';
+import { useStepHistoryStore } from '../../stores/step-history';
 
-interface CircularProgressProps {
+type Props = {
   current: number;
   goal: number;
   radius?: number;
   dashCount?: number;
-  isWalking: boolean;
-  onStartWalk: () => void;
-  onStopWalk?: () => void;
-}
+};
 
-type DisplayMode = 'steps' | 'distance';
+export default function CircularProgress({ current, goal, radius = 140, dashCount = 60 }: Props) {
+  const unit = useStepHistoryStore((s) => s.unit);
+  const setUnit = useStepHistoryStore((s) => s.setUnit);
 
-export default function CircularProgress({
-  current,
-  goal,
-  radius = 140,
-  dashCount = 60,
-  isWalking,
-  onStartWalk,
-  onStopWalk,
-}: CircularProgressProps) {
-  const [displayMode, setDisplayMode] = useState<DisplayMode>('steps');
-  
   const progress = Math.min(current / goal, 1);
   const filledDashes = Math.floor(progress * dashCount);
-  
+
   // Calculate distance: average step length is 0.762 meters
   const meters = current * 0.762;
   const kilometers = meters / 1000;
-  
-  // Toggle display mode
-  const toggleDisplayMode = () => {
-    setDisplayMode(prev => prev === 'steps' ? 'distance' : 'steps');
+
+  const toggleUnit = () => {
+    setUnit(unit === 'steps' ? 'km' : 'steps');
   };
-  
-  // Format display value and label
+
   const getDisplayValue = () => {
-    if (displayMode === 'steps') {
+    if (unit === 'steps') {
       return current.toLocaleString('de-DE');
     } else {
       if (meters < 1000) {
@@ -49,25 +34,21 @@ export default function CircularProgress({
       }
     }
   };
-  
+
   const getDisplayLabel = () => {
-    if (displayMode === 'steps') {
+    if (unit === 'steps') {
       return 'steps';
     } else {
       return meters < 1000 ? 'meters' : 'kilometers';
     }
   };
 
-  // Create array of dashes positioned in a circle
   const dashes = Array.from({ length: dashCount }, (_, i) => {
-    const angle = (i / dashCount) * 2 * Math.PI - Math.PI / 2; // Start from top
+    const angle = (i / dashCount) * 2 * Math.PI - Math.PI / 2;
     const isFilled = i < filledDashes;
-    
-    // Position dash at the edge of the circle
+
     const x = Math.cos(angle) * radius;
     const y = Math.sin(angle) * radius;
-    
-    // Rotate dash to be perpendicular to the circle (pointing outward)
     const rotation = `${(angle + Math.PI / 2) * (180 / Math.PI)}deg`;
 
     return (
@@ -93,71 +74,23 @@ export default function CircularProgress({
   });
 
   return (
-    <View style={styles.container} pointerEvents="box-none">
-      <View 
-        style={[styles.progressContainer, { width: radius * 2 + 100, height: radius * 2 + 100 }]}
-        pointerEvents="box-none"
-      >
-        <TouchableOpacity 
-          style={styles.centerContent}
-          onPress={toggleDisplayMode}
+    <View className="items-center">
+      <View style={{ width: radius * 2 + 100, height: radius * 2 + 100 }}>
+        <TouchableOpacity
           activeOpacity={0.7}
-          pointerEvents="auto"
+          onPress={toggleUnit}
+          className="absolute inset-0 justify-center items-center"
         >
-          <Text style={styles.stepsCount}>
-            {getDisplayValue()}
-          </Text>
+          <Text style={styles.stepsCount}>{getDisplayValue()}</Text>
           <Text style={styles.stepsLabel}>{getDisplayLabel()}</Text>
         </TouchableOpacity>
         {dashes}
-      </View>
-      
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity 
-          style={styles.button}
-          onPress={onStartWalk}
-          activeOpacity={0.8}
-          pointerEvents="auto"
-        >
-          <Text style={styles.buttonText}>
-            {isWalking ? 'WALKING...' : 'START WALK'}
-          </Text>
-        </TouchableOpacity>
-        
-        {isWalking && (
-          <TouchableOpacity 
-            style={styles.circularButton}
-            onPress={onStopWalk}
-            activeOpacity={0.8}
-            pointerEvents="auto"
-          >
-            <Square size={18} color="#1a1a1a" strokeWidth={0} fill="#1a1a1a" />
-          </TouchableOpacity>
-        )}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 32,
-  },
-  progressContainer: {
-    position: 'relative',
-  },
-  centerContent: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   stepsCount: {
     fontSize: 48,
     color: '#fff',
@@ -170,33 +103,8 @@ const styles = StyleSheet.create({
     fontFamily: 'JetBrainsMono_400Regular',
   },
   dash: {
-    position: 'absolute',
-    height: 32,
     width: 2,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  button: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 100,
-  },
-  buttonText: {
-    color: '#1a1a1a',
-    fontSize: 14,
-    fontFamily: 'JetBrainsMono_600SemiBold',
-    letterSpacing: 0.5,
-  },
-  circularButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: 32,
+    position: 'absolute',
   },
 });

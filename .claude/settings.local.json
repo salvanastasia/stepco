@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(bunx expo install:*)",
-      "Bash(bun add:*)"
+      "Bash(bun add:*)",
+      "Bash(npx tailwindcss init)",
+      "WebFetch(domain:docs.swmansion.com)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }

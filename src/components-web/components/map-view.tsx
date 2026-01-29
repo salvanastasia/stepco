@@ -6,112 +6,70 @@ const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
 // Dark map style
 const darkMapStyle = [
   {
-    "featureType": "all",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      { "saturation": 36 },
-      { "color": "#000000" },
-      { "lightness": 40 }
-    ]
+    featureType: 'all',
+    elementType: 'labels.text.fill',
+    stylers: [{ saturation: 36 }, { color: '#000000' }, { lightness: 40 }],
   },
   {
-    "featureType": "all",
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      { "visibility": "on" },
-      { "color": "#000000" },
-      { "lightness": 16 }
-    ]
+    featureType: 'all',
+    elementType: 'labels.text.stroke',
+    stylers: [{ visibility: 'on' }, { color: '#000000' }, { lightness: 16 }],
   },
   {
-    "featureType": "all",
-    "elementType": "labels.icon",
-    "stylers": [
-      { "visibility": "off" }
-    ]
+    featureType: 'all',
+    elementType: 'labels.icon',
+    stylers: [{ visibility: 'off' }],
   },
   {
-    "featureType": "administrative",
-    "elementType": "geometry.fill",
-    "stylers": [
-      { "color": "#000000" },
-      { "lightness": 20 }
-    ]
+    featureType: 'administrative',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#000000' }, { lightness: 20 }],
   },
   {
-    "featureType": "administrative",
-    "elementType": "geometry.stroke",
-    "stylers": [
-      { "color": "#000000" },
-      { "lightness": 17 },
-      { "weight": 1.2 }
-    ]
+    featureType: 'administrative',
+    elementType: 'geometry.stroke',
+    stylers: [{ color: '#000000' }, { lightness: 17 }, { weight: 1.2 }],
   },
   {
-    "featureType": "landscape",
-    "elementType": "geometry",
-    "stylers": [
-      { "color": "#000000" },
-      { "lightness": 20 }
-    ]
+    featureType: 'landscape',
+    elementType: 'geometry',
+    stylers: [{ color: '#000000' }, { lightness: 20 }],
   },
   {
-    "featureType": "poi",
-    "elementType": "geometry",
-    "stylers": [
-      { "color": "#000000" },
-      { "lightness": 21 }
-    ]
+    featureType: 'poi',
+    elementType: 'geometry',
+    stylers: [{ color: '#000000' }, { lightness: 21 }],
   },
   {
-    "featureType": "road.highway",
-    "elementType": "geometry.fill",
-    "stylers": [
-      { "color": "#000000" },
-      { "lightness": 17 }
-    ]
+    featureType: 'road.highway',
+    elementType: 'geometry.fill',
+    stylers: [{ color: '#000000' }, { lightness: 17 }],
   },
   {
-    "featureType": "road.highway",
-    "elementType": "geometry.stroke",
-    "stylers": [
-      { "color": "#000000" },
-      { "lightness": 29 },
-      { "weight": 0.2 }
-    ]
+    featureType: 'road.highway',
+    elementType: 'geometry.stroke',
+    stylers: [{ color: '#000000' }, { lightness: 29 }, { weight: 0.2 }],
   },
   {
-    "featureType": "road.arterial",
-    "elementType": "geometry",
-    "stylers": [
-      { "color": "#000000" },
-      { "lightness": 18 }
-    ]
+    featureType: 'road.arterial',
+    elementType: 'geometry',
+    stylers: [{ color: '#000000' }, { lightness: 18 }],
   },
   {
-    "featureType": "road.local",
-    "elementType": "geometry",
-    "stylers": [
-      { "color": "#000000" },
-      { "lightness": 16 }
-    ]
+    featureType: 'road.local',
+    elementType: 'geometry',
+    stylers: [{ color: '#000000' }, { lightness: 16 }],
   },
   {
-    "featureType": "transit",
-    "elementType": "geometry",
-    "stylers": [
-      { "color": "#000000" },
-      { "lightness": 19 }
-    ]
+    featureType: 'transit',
+    elementType: 'geometry',
+    stylers: [{ color: '#000000' }, { lightness: 19 }],
   },
   {
-    "featureType": "water",
-    "elementType": "geometry",
-    "stylers": [
-      { "color": "#000000" },
-      { "lightness": 17 }
-    ]
-  }
+    featureType: 'water',
+    elementType: 'geometry',
+    stylers: [{ color: '#000000' }, { lightness: 17 }],
+  },
 ];
 
 export default function MapView() {
@@ -173,10 +131,10 @@ export default function MapView() {
       (pos) => {
         const newPos = {
           lat: pos.coords.latitude,
-          lng: pos.coords.longitude
+          lng: pos.coords.longitude,
         };
         setPosition(newPos);
-        setPathCoords(prev => [...prev, newPos]);
+        setPathCoords((prev) => [...prev, newPos]);
         setError(null);
       },
       (err) => {
@@ -186,7 +144,7 @@ export default function MapView() {
       {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge: 0
+        maximumAge: 0,
       }
     );
 
@@ -216,7 +174,7 @@ export default function MapView() {
           fillOpacity: 1,
           strokeColor: '#ffffff',
           strokeWeight: 2,
-        }
+        },
       });
     }
 
@@ -253,19 +211,17 @@ export default function MapView() {
   return (
     <div className="size-full relative">
       <div ref={mapContainerRef} className="size-full" />
-      
+
       <div className="absolute top-8 left-8 bg-[#2a2a2a] rounded-lg px-4 py-3 border border-[#3a3a3a] font-mono z-[1000]">
         <div className="text-white text-sm">
           {position ? 'Current Location' : 'Getting location...'}
         </div>
         <div className="text-[#999] text-xs mt-1">
-          {position ? (
-            `${position.lat.toFixed(6)}, ${position.lng.toFixed(6)}`
-          ) : error ? (
-            error
-          ) : (
-            'Please allow location access'
-          )}
+          {position
+            ? `${position.lat.toFixed(6)}, ${position.lng.toFixed(6)}`
+            : error
+              ? error
+              : 'Please allow location access'}
         </div>
       </div>
     </div>
