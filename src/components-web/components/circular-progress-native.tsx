@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useStepHistoryStore } from '../../stores/step-history';
+import { AnimatedCount } from '../../components/animated-count-text/components/animated-count';
 
 type Props = {
   current: number;
@@ -25,10 +26,10 @@ export default function CircularProgress({ current, goal, radius = 140, dashCoun
 
   const getDisplayValue = () => {
     if (unit === 'steps') {
-      return current.toLocaleString('de-DE');
+      return current;
     } else {
       if (meters < 1000) {
-        return Math.round(meters).toLocaleString('de-DE');
+        return Math.round(meters);
       } else {
         return kilometers.toFixed(2).replace('.', ',');
       }
@@ -81,7 +82,7 @@ export default function CircularProgress({ current, goal, radius = 140, dashCoun
           onPress={toggleUnit}
           className="absolute inset-0 justify-center items-center"
         >
-          <Text style={styles.stepsCount}>{getDisplayValue()}</Text>
+          <AnimatedCount number={getDisplayValue()} />
           <Text style={styles.stepsLabel}>{getDisplayLabel()}</Text>
         </TouchableOpacity>
         {dashes}
