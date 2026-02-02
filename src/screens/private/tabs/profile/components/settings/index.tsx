@@ -36,6 +36,7 @@ const SettingsBottomSheet = ({ ref }: Props) => {
   const [{ width }, onLayout] = useLayout();
   const tooltipOpacity = useSharedValue(0);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const prevGoalRef = useRef(goal);
   // #endregion
   // #region callbacks
   const updateGoal = useCallback(
@@ -43,8 +44,12 @@ const SettingsBottomSheet = ({ ref }: Props) => {
       if (width <= 0) return;
       const percentage = Math.max(0, Math.min(1, x / width));
       const newGoal = Math.round(MIN_GOAL + percentage * (MAX_GOAL - MIN_GOAL));
-      const snapped = Math.round(newGoal / STEP_SIZE) * STEP_SIZE;
-      setGoal(Math.max(MIN_GOAL, Math.min(MAX_GOAL, snapped)));
+      const snapped = Math.max(MIN_GOAL, Math.min(MAX_GOAL, Math.round(newGoal / STEP_SIZE) * STEP_SIZE));
+      if (snapped !== prevGoalRef.current) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        prevGoalRef.current = snapped;
+      }
+      setGoal(snapped);
     },
     [setGoal, width]
   );
