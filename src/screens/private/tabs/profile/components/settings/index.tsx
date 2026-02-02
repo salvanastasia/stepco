@@ -23,6 +23,14 @@ const STEP_SIZE = 500;
 const MAX_GOAL = 10000;
 const TICK_COUNT = (MAX_GOAL - MIN_GOAL) / STEP_SIZE;
 const TICKS = Array.from({ length: TICK_COUNT }, (_, i) => i);
+const STEPS_TO_KM = 0.000762;
+
+const formatGoal = (steps: number, unit: 'km' | 'steps') => {
+  if (unit === 'km') {
+    return (steps * STEPS_TO_KM).toFixed(2);
+  }
+  return steps.toString();
+};
 
 const snapPoints = ['40%'];
 
@@ -31,6 +39,7 @@ const { height } = Dimensions.get('window');
 const SettingsBottomSheet = ({ ref }: Props) => {
   // #region states
   const goal = useStepHistoryStore((s) => s.goal);
+  const unit = useStepHistoryStore((s) => s.unit);
   const setGoal = useStepHistoryStore((s) => s.setGoal);
   // #endregion
   // #region hooks
@@ -45,7 +54,10 @@ const SettingsBottomSheet = ({ ref }: Props) => {
       if (width <= 0) return;
       const percentage = Math.max(0, Math.min(1, x / width));
       const newGoal = Math.round(MIN_GOAL + percentage * (MAX_GOAL - MIN_GOAL));
-      const snapped = Math.max(MIN_GOAL, Math.min(MAX_GOAL, Math.round(newGoal / STEP_SIZE) * STEP_SIZE));
+      const snapped = Math.max(
+        MIN_GOAL,
+        Math.min(MAX_GOAL, Math.round(newGoal / STEP_SIZE) * STEP_SIZE)
+      );
       if (snapped !== prevGoalRef.current) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         prevGoalRef.current = snapped;
@@ -66,7 +78,7 @@ const SettingsBottomSheet = ({ ref }: Props) => {
   const hideTooltip = useCallback(() => {
     hideTimeoutRef.current = setTimeout(() => {
       tooltipOpacity.value = withSpring(0);
-    }, 1000);
+    }, 2000);
   }, [tooltipOpacity]);
   // #endregion
   // #region gestures
@@ -120,7 +132,7 @@ const SettingsBottomSheet = ({ ref }: Props) => {
             <View className="gap-4">
               {/* Tick marks with tooltip */}
               <View onLayout={onLayout} className="relative">
-                <GoalTooltip goal={goal} trackWidth={width} opacity={tooltipOpacity} />
+                <GoalTooltip goal={goal} unit={unit} trackWidth={width} opacity={tooltipOpacity} />
                 <View className="flex-row justify-between items-center">
                   {TICKS.map((i) => (
                     <Tick key={i} index={i} isFilled={i < filledCount} />
@@ -128,7 +140,7 @@ const SettingsBottomSheet = ({ ref }: Props) => {
                 </View>
               </View>
               {/* Labels */}
-              <GoalLabels />
+              <GoalLabels unit={unit} />
             </View>
           </GestureDetector>
         </View>
@@ -203,13 +215,14 @@ const tooltipPath = tooltipPathResult ?? Skia.Path.Make();
 
 type GoalTooltipProps = {
   goal: number;
+  unit: 'km' | 'steps';
   trackWidth: number;
   opacity: SharedValue<number>;
 };
 
 const TICK_WIDTH = 6; // w-1.5 in tailwind
 
-const GoalTooltip = memo(({ goal, trackWidth, opacity }: GoalTooltipProps) => {
+const GoalTooltip = memo(({ goal, unit, trackWidth, opacity }: GoalTooltipProps) => {
   // #region hooks
   const translateX = useSharedValue(0);
   // #endregion
@@ -258,7 +271,7 @@ const GoalTooltip = memo(({ goal, trackWidth, opacity }: GoalTooltipProps) => {
         />
       </Canvas>
       <View style={tooltipStyles.textContainer}>
-        <Text className="text-white font-mono-semibold text-lg">{goal}</Text>
+        <Text className="text-white font-mono-semibold text-lg">{formatGoal(goal, unit)}</Text>
       </View>
     </Animated.View>
   );
@@ -290,11 +303,15 @@ const tooltipStyles = StyleSheet.create({
 
 const GOAL_LABELS = [MIN_GOAL, 5000, MAX_GOAL];
 
-const GoalLabels = memo(() => (
+type GoalLabelsProps = {
+  unit: 'km' | 'steps';
+};
+
+const GoalLabels = memo(({ unit }: GoalLabelsProps) => (
   <View className="flex-row items-center justify-between">
     {GOAL_LABELS.map((label, index) => (
       <Text key={`${index}-${label}`} className="text-[#666666] font-mono">
-        {label}
+        {formatGoal(label, unit)}
       </Text>
     ))}
   </View>
