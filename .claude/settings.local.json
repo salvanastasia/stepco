@@ -5,7 +5,9 @@
       "Bash(bun add:*)",
       "Bash(npx tailwindcss init)",
       "WebFetch(domain:docs.swmansion.com)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "WebSearch",
+      "WebFetch(domain:shopify.github.io)"
     ]
   }
 }
