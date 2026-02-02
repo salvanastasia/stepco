@@ -78,7 +78,7 @@ const SettingsBottomSheet = ({ ref }: Props) => {
   const hideTooltip = useCallback(() => {
     hideTimeoutRef.current = setTimeout(() => {
       tooltipOpacity.value = withSpring(0);
-    }, 2000);
+    }, 1500);
   }, [tooltipOpacity]);
   // #endregion
   // #region gestures
@@ -307,15 +307,28 @@ type GoalLabelsProps = {
   unit: 'km' | 'steps';
 };
 
+const MIDDLE_LABEL_WIDTH = 50;
+
 const GoalLabels = memo(({ unit }: GoalLabelsProps) => (
-  <View className="flex-row items-center justify-between">
-    {GOAL_LABELS.map((label, index) => (
-      <Text key={`${index}-${label}`} className="text-[#666666] font-mono">
-        {formatGoal(label, unit)}
-      </Text>
-    ))}
+  <View className="flex-row items-center justify-between relative">
+    <Text className="text-[#666666] font-mono">{formatGoal(GOAL_LABELS[0], unit)}</Text>
+    <Text
+      className="text-[#666666] font-mono absolute text-center"
+      style={goalLabelStyles.middle}
+    >
+      {formatGoal(GOAL_LABELS[1], unit)}
+    </Text>
+    <Text className="text-[#666666] font-mono">{formatGoal(GOAL_LABELS[2], unit)}</Text>
   </View>
 ));
+
+const goalLabelStyles = StyleSheet.create({
+  middle: {
+    width: MIDDLE_LABEL_WIDTH,
+    left: '50%',
+    marginLeft: -MIDDLE_LABEL_WIDTH / 2,
+  },
+});
 
 const UNIT_LABELS: ('km' | 'steps')[] = ['km', 'steps'];
 const INDICATOR_PADDING = 2;
