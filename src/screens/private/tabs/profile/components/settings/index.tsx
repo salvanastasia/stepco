@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useLayout } from '../../../../../../features';
 import Backdrop from '../../../../../../components/backdrop';
 import { useStepHistoryStore } from '../../../../../../stores';
@@ -22,6 +22,7 @@ const MIN_GOAL = 0;
 const STEP_SIZE = 500;
 const MAX_GOAL = 10000;
 const TICK_COUNT = (MAX_GOAL - MIN_GOAL) / STEP_SIZE;
+const TICKS = Array.from({ length: TICK_COUNT }, (_, i) => i);
 
 const snapPoints = ['40%'];
 
@@ -69,39 +70,29 @@ const SettingsBottomSheet = ({ ref }: Props) => {
   }, [tooltipOpacity]);
   // #endregion
   // #region gestures
-  const panGesture = Gesture.Pan()
-    .runOnJS(true)
-    .onStart((e) => {
-      showTooltip();
-      updateGoal(e.x);
-    })
-    .onUpdate((e) => updateGoal(e.x))
-    .onEnd(() => hideTooltip());
+  const composedGesture = useMemo(() => {
+    const panGesture = Gesture.Pan()
+      .runOnJS(true)
+      .onStart((e) => {
+        showTooltip();
+        updateGoal(e.x);
+      })
+      .onUpdate((e) => updateGoal(e.x))
+      .onEnd(() => hideTooltip());
 
-  const tapGesture = Gesture.Tap()
-    .runOnJS(true)
-    .onEnd((e) => {
-      showTooltip();
-      updateGoal(e.x);
-      hideTooltip();
-    });
+    const tapGesture = Gesture.Tap()
+      .runOnJS(true)
+      .onEnd((e) => {
+        showTooltip();
+        updateGoal(e.x);
+        hideTooltip();
+      });
 
-  const composedGesture = Gesture.Race(panGesture, tapGesture);
+    return Gesture.Race(panGesture, tapGesture);
+  }, [showTooltip, hideTooltip, updateGoal]);
   // #endregion
   // #region renders
-  const renderTicks = useCallback(
-    (_: unknown, i: number) => {
-      const tickValue = MIN_GOAL + i * STEP_SIZE;
-      const isFilled = tickValue < goal;
-      return (
-        <View
-          key={i}
-          className={`h-10 w-1.5 rounded-sm ${isFilled ? 'bg-[#FFFFFF]' : 'bg-[#333333]'}`}
-        />
-      );
-    },
-    [goal]
-  );
+  const filledCount = goal / STEP_SIZE;
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => <Backdrop {...props} />,
     []
@@ -131,7 +122,9 @@ const SettingsBottomSheet = ({ ref }: Props) => {
               <View onLayout={onLayout} className="relative">
                 <GoalTooltip goal={goal} trackWidth={width} opacity={tooltipOpacity} />
                 <View className="flex-row justify-between items-center">
-                  {Array.from({ length: TICK_COUNT }, renderTicks)}
+                  {TICKS.map((i) => (
+                    <Tick key={i} index={i} isFilled={i < filledCount} />
+                  ))}
                 </View>
               </View>
               {/* Labels */}
@@ -157,6 +150,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#111111',
   },
 });
+
+// Memoized Tick component - only re-renders when isFilled changes
+type TickProps = { index: number; isFilled: boolean };
+const Tick = memo(
+  ({ isFilled }: TickProps) => (
+    <View className={`h-10 w-1.5 rounded-sm ${isFilled ? 'bg-[#FFFFFF]' : 'bg-[#333333]'}`} />
+  ),
+  (prev, next) => prev.isFilled === next.isFilled
+);
 
 const TOOLTIP_WIDTH = 80;
 const TOOLTIP_HEIGHT = 40;
@@ -207,7 +209,7 @@ type GoalTooltipProps = {
 
 const TICK_WIDTH = 6; // w-1.5 in tailwind
 
-const GoalTooltip = ({ goal, trackWidth, opacity }: GoalTooltipProps) => {
+const GoalTooltip = memo(({ goal, trackWidth, opacity }: GoalTooltipProps) => {
   // #region hooks
   const translateX = useSharedValue(0);
   // #endregion
@@ -260,7 +262,7 @@ const GoalTooltip = ({ goal, trackWidth, opacity }: GoalTooltipProps) => {
       </View>
     </Animated.View>
   );
-};
+});
 
 const tooltipStyles = StyleSheet.create({
   container: {
@@ -288,25 +290,20 @@ const tooltipStyles = StyleSheet.create({
 
 const GOAL_LABELS = [MIN_GOAL, 5000, MAX_GOAL];
 
-const GoalLabels = () => {
-  // #region renders
-  const renderLabel = useCallback((label: number, index: number) => {
-    return (
+const GoalLabels = memo(() => (
+  <View className="flex-row items-center justify-between">
+    {GOAL_LABELS.map((label, index) => (
       <Text key={`${index}-${label}`} className="text-[#666666] font-mono">
         {label}
       </Text>
-    );
-  }, []);
-  // #endregion
-  return (
-    <View className="flex-row items-center justify-between">{GOAL_LABELS.map(renderLabel)}</View>
-  );
-};
+    ))}
+  </View>
+));
 
 const UNIT_LABELS: ('km' | 'steps')[] = ['km', 'steps'];
 const INDICATOR_PADDING = 2;
 
-const UnitSelector = () => {
+const UnitSelector = memo(() => {
   // #region states
   const unit = useStepHistoryStore((s) => s.unit);
   // #endregion
@@ -366,7 +363,7 @@ const UnitSelector = () => {
       </View>
     </View>
   );
-};
+});
 
 const unitStyles = StyleSheet.create({
   indicator: {
