@@ -58,5 +58,7 @@ const PrivateLayout = () => {
 export default PrivateLayout;
 
 const styles = StyleSheet.create({
-  tabView: { backgroundColor: '#1a1a1a', paddingBottom: 16 },
+  tabView: {
+    backgroundColor: '#1a1a1a',
+  },
 });

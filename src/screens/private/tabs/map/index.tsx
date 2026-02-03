@@ -1,5 +1,8 @@
-import { View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import { Map } from '../../../../components/map';
+
+const { height } = Dimensions.get('window');
 
 const darkMinimalStyle = [
   {
@@ -62,31 +65,7 @@ const darkMinimalStyle = [
 const MapScreen = () => {
   return (
     <View className="flex-1">
-      <MapView
-        style={{ flex: 1 }}
-        provider={PROVIDER_GOOGLE}
-        customMapStyle={darkMinimalStyle}
-        userInterfaceStyle="dark"
-        showsBuildings={true}
-        showsTraffic={false}
-        showsIndoors={false}
-        showsPointsOfInterest={false}
-        showsCompass={false}
-        showsScale={false}
-        showsUserLocation
-        followsUserLocation
-        scrollEnabled={false}
-        zoomEnabled={false}
-        pointerEvents="none"
-        rotateEnabled={false}
-        pitchEnabled={false}
-        initialRegion={{
-          latitude: 41.3275,
-          longitude: 19.8187,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
-      />
+      <Map />
     </View>
   );
 };

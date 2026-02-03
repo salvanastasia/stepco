@@ -7,7 +7,9 @@
       "WebFetch(domain:docs.swmansion.com)",
       "mcp__ide__getDiagnostics",
       "WebSearch",
-      "WebFetch(domain:shopify.github.io)"
+      "WebFetch(domain:shopify.github.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:maplibre.org)"
     ]
   }
 }

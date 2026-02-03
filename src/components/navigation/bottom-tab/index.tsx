@@ -59,7 +59,7 @@ const BottomTab: React.FC<Props> = ({ navigationState, position, onItemClick }) 
 
   // #endregion
   return (
-    <Animated.View className="p-4 overflow-hidden justify-center items-center">
+    <Animated.View className="p-4 overflow-hidden justify-center items-center absolute bottom-safe w-full">
       <View className="flex-row bg-neutral-800 rounded-2xl w-2/3 " onLayout={onLayout}>
         {measured && navigationState.routes.map((route, index) => renderItem(route, index))}
       </View>
