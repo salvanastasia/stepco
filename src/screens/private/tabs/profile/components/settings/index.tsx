@@ -28,7 +28,7 @@ const STEPS_TO_KM = 0.000762;
 
 const formatGoal = (steps: number, unit: 'km' | 'steps') => {
   if (unit === 'km') {
-    return (steps * STEPS_TO_KM).toFixed(2);
+    return (steps * STEPS_TO_KM).toFixed(2).replace('.', ',');
   }
   return steps.toString();
 };
@@ -296,13 +296,23 @@ const GoalTooltip = memo(({ goal, unit, trackWidth, opacity }: GoalTooltipProps)
         {formatGoal(goal, unit)
           .split('')
           .map((char, index) => {
+            const isDigit = /\d/.test(char);
+            if (isDigit) {
+              return (
+                <AnimatedDigit
+                  key={index}
+                  width={12}
+                  height={18}
+                  digit={Number(char)}
+                  textStyle={tooltipStyles.counter}
+                />
+              );
+            }
+            // Render static character for non-digits (comma, dot)
             return (
-              <AnimatedDigit
-                width={12}
-                height={18}
-                digit={Number(char)}
-                textStyle={tooltipStyles.counter}
-              />
+              <Text key={index} style={[tooltipStyles.counter, tooltipStyles.separator]}>
+                {char}
+              </Text>
             );
           })}
       </View>
@@ -336,6 +346,12 @@ const tooltipStyles = StyleSheet.create({
   counter: {
     fontSize: 14,
     color: 'white',
+  },
+  separator: {
+    width: 6,
+    height: 18,
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
 });
 
