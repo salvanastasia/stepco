@@ -1,3 +1,4 @@
+import { forwardRef, useImperativeHandle } from 'react';
 import { Group, ImageSVG, Text } from '@shopify/react-native-skia';
 import Touchable from 'react-native-skia-gesture';
 
@@ -6,6 +7,10 @@ import { useCloseButtonAnimations } from './use-close-buttons-animations';
 import { useDeleteButtonAnimations } from './use-delete-button-animations';
 import { useGooeyLayer } from './use-gooey-layer';
 import { useTextAnimations } from './use-text-animations';
+
+export type DeleteButtonRef = {
+  close: () => void;
+};
 
 type DeleteButtonProps = {
   onConfirmDeletion: () => void;
@@ -19,7 +24,7 @@ type DeleteButtonProps = {
   closeOnConfirm?: boolean;
 };
 
-export const DeleteButton = ({
+export const DeleteButton = forwardRef<DeleteButtonRef, DeleteButtonProps>(({
   onConfirmDeletion,
   onInitialClick,
   onClose,
@@ -29,7 +34,7 @@ export const DeleteButton = ({
   initialText = 'START WALKING',
   confirmText = 'WALKING...',
   closeOnConfirm = false,
-}: DeleteButtonProps) => {
+}, ref) => {
   const { isToggled, deleteButtonRectX, deleteButtonColor, gestureHandler, buttonTransform } =
     useDeleteButtonAnimations({
       additionalWidth,
@@ -39,6 +44,13 @@ export const DeleteButton = ({
       },
       onInitialClick,
     });
+
+  useImperativeHandle(ref, () => ({
+    close: () => {
+      isToggled.value = false;
+      onClose?.();
+    },
+  }), [isToggled, onClose]);
 
   const { closeIconCircleX, closeButtonOpacity, gestureHandlerClose, closeButtonTransform, paint } =
     useCloseButtonAnimations({ isToggled, width, additionalWidth, onClose });
@@ -125,4 +137,4 @@ export const DeleteButton = ({
       </Group>
     </Touchable.Canvas>
   );
-};
+});

@@ -13,12 +13,13 @@ export default function CircularProgress({ current, goal, radius = 140, dashCoun
   const unit = useStepHistoryStore((s) => s.unit);
   const setUnit = useStepHistoryStore((s) => s.setUnit);
 
+  const remaining = Math.max(goal - current, 0);
   const progress = Math.min(current / goal, 1);
   const filledDashes = Math.floor(progress * dashCount);
 
   // Calculate distance: average step length is 0.762 meters
-  const meters = current * 0.762;
-  const kilometers = meters / 1000;
+  const remainingMeters = remaining * 0.762;
+  const remainingKilometers = remainingMeters / 1000;
 
   const toggleUnit = () => {
     setUnit(unit === 'steps' ? 'km' : 'steps');
@@ -26,21 +27,21 @@ export default function CircularProgress({ current, goal, radius = 140, dashCoun
 
   const getDisplayValue = () => {
     if (unit === 'steps') {
-      return current;
+      return remaining;
     } else {
-      if (meters < 1000) {
-        return Math.round(meters);
+      if (remainingMeters < 1000) {
+        return Math.round(remainingMeters);
       } else {
-        return kilometers.toFixed(2).replace('.', ',');
+        return remainingKilometers.toFixed(2).replace('.', ',');
       }
     }
   };
 
   const getDisplayLabel = () => {
     if (unit === 'steps') {
-      return 'steps';
+      return 'steps left';
     } else {
-      return meters < 1000 ? 'meters' : 'kilometers';
+      return remainingMeters < 1000 ? 'meters left' : 'km left';
     }
   };
 

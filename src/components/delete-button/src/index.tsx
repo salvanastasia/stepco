@@ -1,12 +1,15 @@
-import { DeleteButton } from './components/delete-button';
+import { forwardRef } from 'react';
+import { DeleteButton, DeleteButtonRef } from './components/delete-button';
 
 type Props = {
   onClose?: () => void;
   onInitialClick?: () => void;
 };
-const App = ({ onClose, onInitialClick }: Props) => {
+
+const App = forwardRef<DeleteButtonRef, Props>(({ onClose, onInitialClick }, ref) => {
   return (
     <DeleteButton
+      ref={ref}
       height={50}
       width={150}
       onClose={onClose}
@@ -15,6 +18,7 @@ const App = ({ onClose, onInitialClick }: Props) => {
       onInitialClick={onInitialClick}
     />
   );
-};
+});
 
 export { App };
+export type { DeleteButtonRef };

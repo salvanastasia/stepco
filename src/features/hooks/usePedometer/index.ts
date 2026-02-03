@@ -55,7 +55,7 @@ export const usePedometer = () => {
         if (currentSteps < goal) {
           incrementSteps(1);
         }
-      }, 1000);
+      }, 10);
       return () => clearInterval(id);
     }
 
