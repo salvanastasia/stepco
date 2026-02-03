@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLayout } from '../../../../../../features';
 import Backdrop from '../../../../../../components/backdrop';
 import { useStepHistoryStore } from '../../../../../../stores';
@@ -38,18 +38,27 @@ const { height } = Dimensions.get('window');
 
 const SettingsBottomSheet = ({ ref }: Props) => {
   // #region states
-  const goal = useStepHistoryStore((s) => s.goal);
+  const storeGoal = useStepHistoryStore((s) => s.goal);
   const unit = useStepHistoryStore((s) => s.unit);
-  const setGoal = useStepHistoryStore((s) => s.setGoal);
+  const setStoreGoal = useStepHistoryStore((s) => s.setGoal);
+  // Local goal state for smooth UI during dragging
+  const [localGoal, setLocalGoal] = useState(storeGoal);
+  const isDraggingRef = useRef(false);
   // #endregion
   // #region hooks
   const [{ width }, onLayout] = useLayout();
   const tooltipOpacity = useSharedValue(0);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const prevGoalRef = useRef(goal);
+  const prevGoalRef = useRef(storeGoal);
   // #endregion
+  // Sync local goal with store when not dragging
+  useEffect(() => {
+    if (!isDraggingRef.current) {
+      setLocalGoal(storeGoal);
+    }
+  }, [storeGoal]);
   // #region callbacks
-  const updateGoal = useCallback(
+  const updateLocalGoal = useCallback(
     (x: number) => {
       if (width <= 0) return;
       const percentage = Math.max(0, Math.min(1, x / width));
@@ -62,24 +71,31 @@ const SettingsBottomSheet = ({ ref }: Props) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         prevGoalRef.current = snapped;
       }
-      setGoal(snapped);
+      setLocalGoal(snapped);
     },
-    [setGoal, width]
+    [width]
   );
+
+  const commitGoal = useCallback(() => {
+    setStoreGoal(prevGoalRef.current);
+    isDraggingRef.current = false;
+  }, [setStoreGoal]);
 
   const showTooltip = useCallback(() => {
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
       hideTimeoutRef.current = null;
     }
+    isDraggingRef.current = true;
     tooltipOpacity.value = withSpring(1);
   }, [tooltipOpacity]);
 
   const hideTooltip = useCallback(() => {
+    commitGoal();
     hideTimeoutRef.current = setTimeout(() => {
       tooltipOpacity.value = withSpring(0);
     }, 1500);
-  }, [tooltipOpacity]);
+  }, [tooltipOpacity, commitGoal]);
   // #endregion
   // #region gestures
   const composedGesture = useMemo(() => {
@@ -87,24 +103,24 @@ const SettingsBottomSheet = ({ ref }: Props) => {
       .runOnJS(true)
       .onStart((e) => {
         showTooltip();
-        updateGoal(e.x);
+        updateLocalGoal(e.x);
       })
-      .onUpdate((e) => updateGoal(e.x))
+      .onUpdate((e) => updateLocalGoal(e.x))
       .onEnd(() => hideTooltip());
 
     const tapGesture = Gesture.Tap()
       .runOnJS(true)
       .onEnd((e) => {
         showTooltip();
-        updateGoal(e.x);
+        updateLocalGoal(e.x);
         hideTooltip();
       });
 
     return Gesture.Race(panGesture, tapGesture);
-  }, [showTooltip, hideTooltip, updateGoal]);
+  }, [showTooltip, hideTooltip, updateLocalGoal]);
   // #endregion
   // #region renders
-  const filledCount = goal / STEP_SIZE;
+  const filledCount = localGoal / STEP_SIZE;
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => <Backdrop {...props} />,
     []
@@ -132,7 +148,12 @@ const SettingsBottomSheet = ({ ref }: Props) => {
             <View className="gap-4">
               {/* Tick marks with tooltip */}
               <View onLayout={onLayout} className="relative">
-                <GoalTooltip goal={goal} unit={unit} trackWidth={width} opacity={tooltipOpacity} />
+                <GoalTooltip
+                  goal={localGoal}
+                  unit={unit}
+                  trackWidth={width}
+                  opacity={tooltipOpacity}
+                />
                 <View className="flex-row justify-between items-center">
                   {TICKS.map((i) => (
                     <Tick key={i} index={i} isFilled={i < filledCount} />
@@ -312,10 +333,7 @@ const MIDDLE_LABEL_WIDTH = 50;
 const GoalLabels = memo(({ unit }: GoalLabelsProps) => (
   <View className="flex-row items-center justify-between relative">
     <Text className="text-[#666666] font-mono">{formatGoal(GOAL_LABELS[0], unit)}</Text>
-    <Text
-      className="text-[#666666] font-mono absolute text-center"
-      style={goalLabelStyles.middle}
-    >
+    <Text className="text-[#666666] font-mono absolute text-center" style={goalLabelStyles.middle}>
       {formatGoal(GOAL_LABELS[1], unit)}
     </Text>
     <Text className="text-[#666666] font-mono">{formatGoal(GOAL_LABELS[2], unit)}</Text>
