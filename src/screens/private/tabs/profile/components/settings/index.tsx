@@ -13,6 +13,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Canvas, Path, Skia, RoundedRect } from '@shopify/react-native-skia';
+import { AnimatedDigit } from '../../../../../../components/animated-count-text/components/animated-digit';
 
 type Props = {
   ref: React.Ref<BottomSheetModal>;
@@ -149,8 +150,8 @@ const SettingsBottomSheet = ({ ref }: Props) => {
               {/* Tick marks with tooltip */}
               <View onLayout={onLayout} className="relative">
                 <GoalTooltip
-                  goal={localGoal}
                   unit={unit}
+                  goal={localGoal}
                   trackWidth={width}
                   opacity={tooltipOpacity}
                 />
@@ -292,7 +293,18 @@ const GoalTooltip = memo(({ goal, unit, trackWidth, opacity }: GoalTooltipProps)
         />
       </Canvas>
       <View style={tooltipStyles.textContainer}>
-        <Text className="text-white font-mono-semibold text-lg">{formatGoal(goal, unit)}</Text>
+        {formatGoal(goal, unit)
+          .split('')
+          .map((char, index) => {
+            return (
+              <AnimatedDigit
+                width={12}
+                height={18}
+                digit={Number(char)}
+                textStyle={tooltipStyles.counter}
+              />
+            );
+          })}
       </View>
     </Animated.View>
   );
@@ -305,8 +317,8 @@ const tooltipStyles = StyleSheet.create({
     alignItems: 'center',
   },
   absolute: {
-    position: 'absolute',
     bottom: 44, // tick height (h-10)
+    position: 'absolute',
   },
   canvas: {
     position: 'absolute',
@@ -314,11 +326,16 @@ const tooltipStyles = StyleSheet.create({
     height: TOOLTIP_HEIGHT + ARROW_SIZE + CANVAS_PADDING * 2,
   },
   textContainer: {
-    width: TOOLTIP_WIDTH + CANVAS_PADDING * 2,
-    height: TOOLTIP_HEIGHT + CANVAS_PADDING,
-    paddingTop: CANVAS_PADDING,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: CANVAS_PADDING,
+    height: TOOLTIP_HEIGHT + CANVAS_PADDING,
+    width: TOOLTIP_WIDTH + CANVAS_PADDING * 2,
+  },
+  counter: {
+    fontSize: 14,
+    color: 'white',
   },
 });
 
