@@ -136,7 +136,6 @@ export default function UserProfileModal({ user, onClose, onFriendRequest, onWal
               </View>
             </View>
           </View>
-        </View>
       </View>
     </Modal>
   );
