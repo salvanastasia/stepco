@@ -40,18 +40,18 @@ export default function CircularProgress({
   const getDisplayValue = () => {
     switch (displayMode) {
       case 0: // Remaining steps
-        return current.toLocaleString('de-DE');
+        return current.toLocaleString('en-US').replace(/,/g, '.');
       case 1: // Steps taken
-        return stepsTaken.toLocaleString('de-DE');
+        return stepsTaken.toLocaleString('en-US').replace(/,/g, '.');
       case 2: // Distance
         if (distanceKm >= 1) {
           return distanceKm.toFixed(2).replace('.', ',');
         } else {
           const meters = Math.round(distanceKm * 1000);
-          return meters.toLocaleString('de-DE');
+          return meters.toLocaleString('en-US').replace(/,/g, '.');
         }
       default:
-        return current.toLocaleString('de-DE');
+        return current.toLocaleString('en-US').replace(/,/g, '.');
     }
   };
 
@@ -86,8 +86,12 @@ export default function CircularProgress({
         style={[
           styles.dash,
           {
-            backgroundColor: isFilled ? (theme === 'bo' ? '#ff4400' : '#fff') : '#333',
+            backgroundColor: isFilled ? (theme === 'bo' ? '#ff4400' : '#ffffff') : '#333333',
+            left: '50%',
+            top: '50%',
             transform: [
+              { translateX: -1 }, // Half of width (2px / 2)
+              { translateY: -16 }, // Half of height (32px / 2)
               { translateX: x },
               { translateY: y },
               { rotate: `${rotation}rad` }
@@ -122,7 +126,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   centerContainer: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -131,21 +139,22 @@ const styles = StyleSheet.create({
   },
   valueText: {
     fontSize: 60,
-    color: '#fff',
+    color: '#ffffff',
     fontFamily: 'Archivo_400Regular',
     fontWeight: '200',
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
   labelText: {
     fontSize: 14,
-    color: '#999',
+    color: '#999999',
     marginTop: 8,
     fontFamily: 'JetBrainsMono_400Regular',
+    includeFontPadding: false,
   },
   dash: {
     position: 'absolute',
     width: 2,
     height: 32,
-    left: '50%',
-    top: '50%',
   },
 });

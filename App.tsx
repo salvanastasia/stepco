@@ -21,6 +21,8 @@ export default function App() {
     Archivo_400Regular,
     Archivo_600SemiBold,
     Archivo_700Bold,
+    DMMono_400Regular: require('@expo-google-fonts/dm-mono').DMMono_400Regular,
+    DMMono_500Medium: require('@expo-google-fonts/dm-mono').DMMono_500Medium,
     JetBrainsMono_400Regular,
     JetBrainsMono_500Medium,
     JetBrainsMono_600SemiBold,

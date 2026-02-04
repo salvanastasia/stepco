@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated } from 'react-native';
 import { TreePine, X } from 'lucide-react-native';
+import DissolveCircularProgress from './dissolve-circular-progress-native';
+import { TextReveal } from './text-reveal-native';
 
 interface WalkCompletionModalProps {
   steps: number;
@@ -14,16 +16,14 @@ export default function WalkCompletionModal({ steps, goal, onClose, theme = 'bw'
   const [showStats, setShowStats] = useState(false);
   const [currentStat, setCurrentStat] = useState(0);
   
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const stat1Anim = useRef(new Animated.Value(0)).current;
-  const stat2Anim = useRef(new Animated.Value(0)).current;
-  const stat3Anim = useRef(new Animated.Value(0)).current;
+  const stat1Opacity = useRef(new Animated.Value(0)).current;
+  const stat2Opacity = useRef(new Animated.Value(0)).current;
+  const stat3Opacity = useRef(new Animated.Value(0)).current;
 
   // Calculate stats
-  const distanceKm = (steps * 0.762) / 1000; // Average step length
-  const caloriesBurned = Math.round(steps * 0.04);
-  const co2SavedKg = (distanceKm * 0.12).toFixed(2); // ~120g CO2/km if driving
-  const treesSaved = Math.round(parseFloat(co2SavedKg) / 0.021); // One tree absorbs ~21kg CO2/year
+  const distanceKm = (steps * 0.762) / 1000;
+  const co2SavedKg = (distanceKm * 0.12).toFixed(2);
+  const treesSaved = Math.round(parseFloat(co2SavedKg) / 0.021);
 
   // Distance comparisons
   const getDistanceComparison = () => {
@@ -54,30 +54,14 @@ export default function WalkCompletionModal({ steps, goal, onClose, theme = 'bw'
     setShowStats(true);
   };
 
-  // Simulate dissolve effect
-  useEffect(() => {
-    if (showProgress) {
-      const timer = setTimeout(() => {
-        handleDissolveComplete();
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [showProgress]);
-
   // Sequential reveal of stats
   useEffect(() => {
     if (!showStats) return;
     
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 600,
-      useNativeDriver: true,
-    }).start();
-
     const timers = [
       setTimeout(() => {
         setCurrentStat(1);
-        Animated.timing(stat1Anim, {
+        Animated.timing(stat1Opacity, {
           toValue: 1,
           duration: 600,
           useNativeDriver: true,
@@ -85,7 +69,7 @@ export default function WalkCompletionModal({ steps, goal, onClose, theme = 'bw'
       }, 100),
       setTimeout(() => {
         setCurrentStat(2);
-        Animated.timing(stat2Anim, {
+        Animated.timing(stat2Opacity, {
           toValue: 1,
           duration: 600,
           useNativeDriver: true,
@@ -93,7 +77,7 @@ export default function WalkCompletionModal({ steps, goal, onClose, theme = 'bw'
       }, 600),
       setTimeout(() => {
         setCurrentStat(3);
-        Animated.timing(stat3Anim, {
+        Animated.timing(stat3Opacity, {
           toValue: 1,
           duration: 600,
           useNativeDriver: true,
@@ -104,7 +88,7 @@ export default function WalkCompletionModal({ steps, goal, onClose, theme = 'bw'
     return () => timers.forEach(clearTimeout);
   }, [showStats]);
 
-  const accentColor = theme === 'bo' ? '#ff4400' : '#fff';
+  const accentColor = theme === 'bo' ? '#ff4400' : '#ffffff';
 
   return (
     <Modal
@@ -115,41 +99,40 @@ export default function WalkCompletionModal({ steps, goal, onClose, theme = 'bw'
     >
       <View style={styles.overlay}>
         {/* Close button */}
-        <TouchableOpacity
-          onPress={onClose}
-          style={styles.closeButton}
-        >
+        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
           <X size={32} color={accentColor} strokeWidth={1.5} />
         </TouchableOpacity>
 
         {/* Content */}
         <View style={styles.content}>
-          {/* Dissolving circular progress - simplified */}
+          {/* Dissolving circular progress */}
           {showProgress && (
-            <View style={styles.progressContainer}>
-              <Text style={[styles.progressText, { color: accentColor }]}>
-                {steps.toLocaleString('de-DE')}
-              </Text>
-              <Text style={styles.progressLabel}>steps completed</Text>
-            </View>
+            <DissolveCircularProgress
+              current={goal - steps}
+              goal={goal}
+              onComplete={handleDissolveComplete}
+              theme={theme}
+            />
           )}
 
           {/* Text reveals */}
           {showStats && (
-            <Animated.View style={[styles.statsContainer, { opacity: fadeAnim }]}>
+            <View style={styles.statsContainer}>
               {/* Main number */}
               {currentStat >= 1 && (
-                <Animated.View style={[styles.mainStat, { opacity: stat1Anim }]}>
-                  <Text style={styles.mainNumber}>{steps.toLocaleString('de-DE')}</Text>
+                <Animated.View style={[styles.mainStat, { opacity: stat1Opacity }]}>
+                  <Text style={styles.mainNumber}>
+                    {steps.toLocaleString('en-US').replace(/,/g, '.')}
+                  </Text>
                   <Text style={styles.mainLabel}>STEPS</Text>
                 </Animated.View>
               )}
 
               {/* Distance comparison */}
               {currentStat >= 2 && (
-                <Animated.View style={[styles.statRow, { opacity: stat2Anim }]}>
+                <Animated.View style={[styles.statRow, { opacity: stat2Opacity }]}>
                   <Text style={styles.statEmoji}>☉</Text>
-                  <Text style={styles.statText}>
+                  <Text style={[styles.statText, { color: 'rgba(255, 255, 255, 0.9)' }]}>
                     {`Today you walked ${
                       comparison.ratio === 1 
                         ? `the length of ${comparison.name}`
@@ -163,19 +146,21 @@ export default function WalkCompletionModal({ steps, goal, onClose, theme = 'bw'
 
               {/* Environmental impact */}
               {currentStat >= 3 && (
-                <Animated.View style={[styles.statRow, { opacity: stat3Anim }]}>
-                  <TreePine size={20} color="#4ade80" strokeWidth={1.5} />
+                <Animated.View style={[styles.statRow, { opacity: stat3Opacity }]}>
+                  <View style={styles.iconContainer}>
+                    <TreePine size={20} color="#4ade80" strokeWidth={1.5} />
+                  </View>
                   <View style={styles.statTextContainer}>
-                    <Text style={styles.statText}>
+                    <Text style={[styles.statText, { color: 'rgba(255, 255, 255, 0.9)' }]}>
                       You saved {co2SavedKg} kg CO₂
                     </Text>
-                    <Text style={styles.statSubtext}>
+                    <Text style={[styles.statText, { color: 'rgba(255, 255, 255, 0.5)', fontSize: 14, marginTop: 4 }]}>
                       Equal to {treesSaved} tree{treesSaved !== 1 ? 's' : ''} working for a day
                     </Text>
                   </View>
                 </Animated.View>
               )}
-            </Animated.View>
+            </View>
           )}
         </View>
       </View>
@@ -203,22 +188,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 48,
   },
-  progressContainer: {
-    alignItems: 'center',
-    gap: 12,
-  },
-  progressText: {
-    fontSize: 60,
-    fontFamily: 'Archivo_400Regular',
-    fontWeight: '200',
-  },
-  progressLabel: {
-    fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontFamily: 'JetBrainsMono_400Regular',
-    textTransform: 'uppercase',
-    letterSpacing: 2,
-  },
   statsContainer: {
     width: '100%',
     gap: 32,
@@ -228,9 +197,10 @@ const styles = StyleSheet.create({
   },
   mainNumber: {
     fontSize: 60,
-    color: '#fff',
+    color: '#ffffff',
     fontFamily: 'Archivo_400Regular',
     fontWeight: '200',
+    includeFontPadding: false,
   },
   mainLabel: {
     fontSize: 20,
@@ -239,6 +209,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 2,
     marginTop: 8,
+    includeFontPadding: false,
   },
   statRow: {
     flexDirection: 'row',
@@ -250,21 +221,21 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'rgba(255, 255, 255, 0.4)',
     marginTop: 2,
+    width: 24,
+  },
+  iconContainer: {
+    width: 24,
+    alignItems: 'center',
+    marginTop: 2,
   },
   statText: {
     flex: 1,
     fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontFamily: 'JetBrainsMono_400Regular',
+    fontFamily: 'DMMono_400Regular',
     lineHeight: 26,
+    includeFontPadding: false,
   },
   statTextContainer: {
     flex: 1,
-    gap: 4,
-  },
-  statSubtext: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.5)',
-    fontFamily: 'JetBrainsMono_400Regular',
   },
 });

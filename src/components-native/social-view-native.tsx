@@ -7,7 +7,7 @@ interface User {
   name: string;
   avatar: any;
   goal: number;
-  distance: number; // in meters
+  distance: number;
   position: { x: number; y: number };
   walks: number;
   isFriend: boolean;
@@ -17,8 +17,9 @@ interface SocialViewProps {
   theme?: 'bw' | 'bo';
 }
 
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
 export default function SocialView({ theme = 'bw' }: SocialViewProps) {
-  const [hoveredUser, setHoveredUser] = useState<User | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([
     {
@@ -53,32 +54,77 @@ export default function SocialView({ theme = 'bw' }: SocialViewProps) {
     },
   ]);
 
-  const pulse1 = useRef(new Animated.Value(1)).current;
-  const pulse2 = useRef(new Animated.Value(1)).current;
-  const pulse3 = useRef(new Animated.Value(1)).current;
+  // Radar pulse animations
+  const pulse1Scale = useRef(new Animated.Value(1)).current;
+  const pulse2Scale = useRef(new Animated.Value(1)).current;
+  const pulse3Scale = useRef(new Animated.Value(1)).current;
+  
+  const pulse1Opacity = useRef(new Animated.Value(0.7)).current;
+  const pulse2Opacity = useRef(new Animated.Value(0.7)).current;
+  const pulse3Opacity = useRef(new Animated.Value(0.7)).current;
+  
+  const centerPulse = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    const createPulse = (anim: Animated.Value, delay: number) => {
-      Animated.loop(
+    // Create continuous radar pulse animations with staggered timing
+    const createPulseAnimation = (
+      scaleAnim: Animated.Value,
+      opacityAnim: Animated.Value,
+      delay: number
+    ) => {
+      return Animated.loop(
         Animated.sequence([
           Animated.delay(delay),
-          Animated.timing(anim, {
-            toValue: 1.2,
-            duration: 2000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(anim, {
-            toValue: 1,
-            duration: 2000,
-            useNativeDriver: true,
-          }),
+          Animated.parallel([
+            Animated.sequence([
+              Animated.timing(scaleAnim, {
+                toValue: 1.15,
+                duration: 2000,
+                useNativeDriver: true,
+              }),
+              Animated.timing(scaleAnim, {
+                toValue: 1,
+                duration: 2000,
+                useNativeDriver: true,
+              }),
+            ]),
+            Animated.sequence([
+              Animated.timing(opacityAnim, {
+                toValue: 0.4,
+                duration: 2000,
+                useNativeDriver: true,
+              }),
+              Animated.timing(opacityAnim, {
+                toValue: 0.7,
+                duration: 2000,
+                useNativeDriver: true,
+              }),
+            ]),
+          ]),
         ])
-      ).start();
+      );
     };
 
-    createPulse(pulse1, 0);
-    createPulse(pulse2, 666);
-    createPulse(pulse3, 1333);
+    // Start pulse animations with delays
+    createPulseAnimation(pulse1Scale, pulse1Opacity, 0).start();
+    createPulseAnimation(pulse2Scale, pulse2Opacity, 666).start();
+    createPulseAnimation(pulse3Scale, pulse3Opacity, 1333).start();
+
+    // Center dot pulse
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(centerPulse, {
+          toValue: 1.2,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(centerPulse, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
   }, []);
 
   const handleFriendRequest = (userId: number) => {
@@ -87,66 +133,105 @@ export default function SocialView({ theme = 'bw' }: SocialViewProps) {
     ));
   };
 
-  const accentColor = theme === 'bo' ? '#ff4400' : '#fff';
+  const accentColor = theme === 'bo' ? '#ff4400' : '#ffffff';
 
   return (
     <View style={styles.container}>
-      {/* Animated radar circles */}
-      <View style={styles.circleContainer}>
-        <Animated.View style={[styles.circle, { transform: [{ scale: pulse3 }] }]}>
-          <Svg width={932} height={932}>
-            <Circle
-              cx={466}
-              cy={466}
-              r={465}
-              stroke="#333"
-              strokeWidth={1}
-              fill="rgba(26, 26, 26, 0.7)"
-            />
-          </Svg>
-        </Animated.View>
-      </View>
+      {/* Animated radar circles - Outermost */}
+      <Animated.View
+        style={[
+          styles.circleContainer,
+          {
+            transform: [{ scale: pulse3Scale }],
+            opacity: pulse3Opacity,
+          },
+        ]}
+      >
+        <Svg width={932} height={932} style={styles.svg}>
+          <Circle
+            cx={466}
+            cy={466}
+            r={465}
+            stroke="#333333"
+            strokeWidth={1}
+            fill="rgba(26, 26, 26, 0.7)"
+          />
+        </Svg>
+      </Animated.View>
 
-      <View style={styles.circleContainer}>
-        <Animated.View style={[styles.circle, { transform: [{ scale: pulse2 }] }]}>
-          <Svg width={621} height={621}>
-            <Circle
-              cx={310.5}
-              cy={310.5}
-              r={310}
-              stroke="#333"
-              strokeWidth={1}
-              fill="rgba(26, 26, 26, 0.7)"
-            />
-          </Svg>
-        </Animated.View>
-      </View>
+      {/* Middle circle */}
+      <Animated.View
+        style={[
+          styles.circleContainer,
+          {
+            transform: [{ scale: pulse2Scale }],
+            opacity: pulse2Opacity,
+          },
+        ]}
+      >
+        <Svg width={621} height={621} style={styles.svg}>
+          <Circle
+            cx={310.5}
+            cy={310.5}
+            r={310}
+            stroke="#333333"
+            strokeWidth={1}
+            fill="rgba(26, 26, 26, 0.7)"
+          />
+        </Svg>
+      </Animated.View>
 
-      <View style={styles.circleContainer}>
-        <Animated.View style={[styles.circle, { transform: [{ scale: pulse1 }] }]}>
-          <Svg width={414} height={414}>
-            <Circle
-              cx={207}
-              cy={207}
-              r={206.5}
-              stroke="#333"
-              strokeWidth={1}
-              fill="rgba(26, 26, 26, 0.7)"
-            />
-          </Svg>
-        </Animated.View>
-      </View>
+      {/* Inner circle */}
+      <Animated.View
+        style={[
+          styles.circleContainer,
+          {
+            transform: [{ scale: pulse1Scale }],
+            opacity: pulse1Opacity,
+          },
+        ]}
+      >
+        <Svg width={414} height={414} style={styles.svg}>
+          <Circle
+            cx={207}
+            cy={207}
+            r={206.5}
+            stroke="#333333"
+            strokeWidth={1}
+            fill="rgba(26, 26, 26, 0.7)"
+          />
+        </Svg>
+      </Animated.View>
       
       {/* Center indicator (you) */}
-      <View style={[styles.centerDot, { backgroundColor: accentColor }]} />
-      <View style={[styles.centerGlow, { backgroundColor: `${accentColor}4D` }]} />
+      <Animated.View
+        style={[
+          styles.centerDot,
+          {
+            backgroundColor: accentColor,
+            transform: [{ scale: centerPulse }],
+          },
+        ]}
+      />
+      
+      {/* Glow around center */}
+      <Animated.View
+        style={[
+          styles.centerGlow,
+          {
+            backgroundColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)',
+            transform: [{ scale: centerPulse }],
+          },
+        ]}
+      />
       
       {/* User avatars */}
-      {users.map((user) => (
+      {users.map((user, index) => (
         <TouchableOpacity
           key={user.id}
           style={[styles.userAvatar, { left: user.position.x, top: user.position.y }]}
           onPress={() => setSelectedUser(user)}
+          activeOpacity={0.7}
         >
           <Image source={user.avatar} style={styles.avatarImage} />
           {user.isFriend && <View style={styles.friendBadge} />}
@@ -172,16 +257,34 @@ export default function SocialView({ theme = 'bw' }: SocialViewProps) {
             <View style={styles.modalContent}>
               <Image source={selectedUser.avatar} style={styles.modalAvatar} />
               <Text style={styles.modalName}>{selectedUser.name}</Text>
-              <Text style={styles.modalInfo}>Goal: {selectedUser.goal.toLocaleString('de-DE')} steps</Text>
+              <Text style={styles.modalInfo}>
+                Goal: {selectedUser.goal.toLocaleString('en-US').replace(/,/g, '.')} steps
+              </Text>
               <Text style={styles.modalInfo}>{selectedUser.walks} walks completed</Text>
               <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: selectedUser.isFriend ? '#666' : accentColor }]}
+                style={[
+                  styles.modalButton,
+                  {
+                    backgroundColor: selectedUser.isFriend ? '#666666' : accentColor,
+                  },
+                ]}
                 onPress={() => {
                   handleFriendRequest(selectedUser.id);
                   setSelectedUser(null);
                 }}
               >
-                <Text style={[styles.modalButtonText, { color: selectedUser.isFriend ? '#fff' : '#1a1a1a' }]}>
+                <Text
+                  style={[
+                    styles.modalButtonText,
+                    {
+                      color: selectedUser.isFriend
+                        ? '#ffffff'
+                        : theme === 'bo'
+                        ? '#ffffff'
+                        : '#1a1a1a',
+                    },
+                  ]}
+                >
                   {selectedUser.isFriend ? 'Remove Friend' : 'Add Friend'}
                 </Text>
               </TouchableOpacity>
@@ -202,26 +305,35 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   circleContainer: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  circle: {
-    opacity: 0.7,
+  svg: {
+    position: 'absolute',
   },
   centerDot: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2.5,
-    borderColor: '#fff',
+    borderColor: '#ffffff',
     position: 'absolute',
+    shadowColor: 'rgba(66, 133, 244, 0.5)',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 10,
   },
   centerGlow: {
     width: 24,
     height: 24,
     borderRadius: 12,
     position: 'absolute',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    elevation: 5,
   },
   userAvatar: {
     position: 'absolute',
@@ -229,6 +341,11 @@ const styles = StyleSheet.create({
     height: 58,
     borderRadius: 15,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   avatarImage: {
     width: '100%',
@@ -250,9 +367,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 72,
     fontSize: 14,
-    color: '#bbb',
-    fontFamily: 'JetBrainsMono_400Regular',
+    color: '#bbbbbb',
+    fontFamily: 'DMMono_400Regular',
     textAlign: 'center',
+    includeFontPadding: false,
   },
   modalOverlay: {
     flex: 1,
@@ -267,6 +385,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     maxWidth: 300,
+    borderWidth: 1,
+    borderColor: '#3a3a3a',
   },
   modalAvatar: {
     width: 80,
@@ -276,13 +396,15 @@ const styles = StyleSheet.create({
   },
   modalName: {
     fontSize: 20,
-    color: '#fff',
+    color: '#ffffff',
     fontFamily: 'JetBrainsMono_600SemiBold',
+    includeFontPadding: false,
   },
   modalInfo: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.7)',
     fontFamily: 'JetBrainsMono_400Regular',
+    includeFontPadding: false,
   },
   modalButton: {
     marginTop: 16,
@@ -294,5 +416,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'JetBrainsMono_600SemiBold',
     textTransform: 'uppercase',
+    includeFontPadding: false,
   },
 });
