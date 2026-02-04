@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Alert, Platform, Dimensions, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, Alert, Platform, TouchableOpacity, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Pedometer } from 'expo-sensors';
 import { useFonts, Archivo_400Regular, Archivo_600SemiBold, Archivo_700Bold } from '@expo-google-fonts/archivo';
@@ -27,8 +27,6 @@ export default function App() {
     JetBrainsMono_500Medium,
     JetBrainsMono_600SemiBold,
   });
-
-  const { width: screenWidth } = Dimensions.get('window');
 
   // Step record interface
   interface StepRecord {
