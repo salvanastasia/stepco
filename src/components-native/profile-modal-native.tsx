@@ -427,9 +427,5 @@ const styles = StyleSheet.create({
     top: '50%',
     left: '50%',
     transform: [{ translateX: -300 }, { translateY: -150 }],
-    shadowColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.08)' : 'rgba(255, 255, 255, 0.04)',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 40,
   },
 });
