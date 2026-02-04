@@ -1,5 +1,4 @@
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { Home, Map, Users, User } from 'lucide-react-native';
 
 type PageType = 'home' | 'map' | 'social' | 'profile';
 
@@ -10,54 +9,23 @@ interface BottomNavProps {
 }
 
 export default function BottomNav({ currentPage, onPageChange, theme = 'bw' }: BottomNavProps) {
-  const activeColor = theme === 'bo' ? '#ff4400' : '#fff';
-  const inactiveColor = '#666';
+  const pages: PageType[] = ['home', 'map', 'social', 'profile'];
+  const accentColor = theme === 'bo' ? '#ff4400' : '#ffffff';
   
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.navItem}
-        onPress={() => onPageChange('home')}
-      >
-        <Home
-          size={24}
-          color={currentPage === 'home' ? activeColor : inactiveColor}
-          strokeWidth={1.5}
+      {pages.map((page) => (
+        <TouchableOpacity
+          key={page}
+          onPress={() => onPageChange(page)}
+          style={[
+            styles.dot,
+            {
+              backgroundColor: currentPage === page ? accentColor : '#666666',
+            },
+          ]}
         />
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.navItem}
-        onPress={() => onPageChange('map')}
-      >
-        <Map
-          size={24}
-          color={currentPage === 'map' ? activeColor : inactiveColor}
-          strokeWidth={1.5}
-        />
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.navItem}
-        onPress={() => onPageChange('social')}
-      >
-        <Users
-          size={24}
-          color={currentPage === 'social' ? activeColor : inactiveColor}
-          strokeWidth={1.5}
-        />
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.navItem}
-        onPress={() => onPageChange('profile')}
-      >
-        <User
-          size={24}
-          color={currentPage === 'profile' ? activeColor : inactiveColor}
-          strokeWidth={1.5}
-        />
-      </TouchableOpacity>
+      ))}
     </View>
   );
 }
@@ -71,10 +39,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 48,
-    paddingHorizontal: 24,
+    gap: 12,
   },
-  navItem: {
-    padding: 12,
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 0, // Square dots like in original
   },
 });

@@ -40,18 +40,18 @@ export default function CircularProgress({
   const getDisplayValue = () => {
     switch (displayMode) {
       case 0: // Remaining steps
-        return current.toLocaleString('en-US').replace(/,/g, '.');
+        return current.toLocaleString('de-DE');
       case 1: // Steps taken
-        return stepsTaken.toLocaleString('en-US').replace(/,/g, '.');
+        return stepsTaken.toLocaleString('de-DE');
       case 2: // Distance
         if (distanceKm >= 1) {
           return distanceKm.toFixed(2).replace('.', ',');
         } else {
           const meters = Math.round(distanceKm * 1000);
-          return meters.toLocaleString('en-US').replace(/,/g, '.');
+          return meters.toLocaleString('de-DE');
         }
       default:
-        return current.toLocaleString('en-US').replace(/,/g, '.');
+        return current.toLocaleString('de-DE');
     }
   };
 
