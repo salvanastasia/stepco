@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, PanResponder, Animated, ViewStyle } from 'react-native';
 import { X } from 'lucide-react-native';
 
@@ -23,7 +23,32 @@ export default function ProfileModal({
   const [isDragging, setIsDragging] = useState(false);
   const [glowPosition, setGlowPosition] = useState({ x: 50, y: 50 });
   const glowOpacity = useRef(new Animated.Value(0)).current;
+  const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const modalTranslateY = useRef(new Animated.Value(300)).current;
   const containerRef = useRef<View>(null);
+
+  // Sequential entry animation
+  useEffect(() => {
+    if (isOpen) {
+      Animated.sequence([
+        Animated.timing(overlayOpacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.spring(modalTranslateY, {
+          toValue: 0,
+          tension: 80,
+          friction: 10,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      // Reset when closed
+      overlayOpacity.setValue(0);
+      modalTranslateY.setValue(300);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -81,23 +106,34 @@ export default function ProfileModal({
     <Modal
       visible={isOpen}
       transparent={true}
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
     >
-      <TouchableOpacity
-        style={styles.backdrop}
-        activeOpacity={1}
-        onPress={onClose}
-      >
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={(e) => e.stopPropagation()}
+      <View style={styles.backdrop}>
+        <Animated.View
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              opacity: overlayOpacity,
+            },
+          ]}
         >
-          <Animated.View
-            style={[
-              styles.modal,
-            ]}
-          >
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={onClose}
+          />
+        </Animated.View>
+        
+        <Animated.View
+          style={[
+            styles.modal,
+            {
+              transform: [{ translateY: modalTranslateY }],
+            },
+          ]}
+        >
           <View style={styles.modalBorder} />
 
           {/* Handle */}
@@ -243,8 +279,7 @@ export default function ProfileModal({
           </TouchableOpacity>
         </View>
       </Animated.View>
-      </TouchableOpacity>
-    </TouchableOpacity>
+      </View>
     </Modal>
   );
 }
