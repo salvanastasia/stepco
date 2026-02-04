@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
   themeButton: {
     width: 80,
     height: 32,
-    padding: 10,
+    paddingHorizontal: 12,
     borderRadius: 8,
     backgroundColor: 'transparent',
     justifyContent: 'center',
