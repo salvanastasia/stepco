@@ -103,22 +103,24 @@ export default function ActivityDetailModal({ activity, goal, onClose, theme = '
       animationType="slide"
       onRequestClose={onClose}
     >
-      <TouchableOpacity
-        style={styles.backdrop}
-        activeOpacity={1}
-        onPress={onClose}
-      >
+      <View style={styles.backdrop}>
+        <TouchableOpacity
+          style={StyleSheet.absoluteFill}
+          activeOpacity={1}
+          onPress={onClose}
+        />
+        
         <Animated.View
           style={[
             styles.modal,
+            isExpanded ? styles.modalExpanded : styles.modalCollapsed,
             {
-              height: isExpanded ? '85%' : 'auto',
               transform: [{ translateY }],
             },
           ]}
           {...panResponder.panHandlers}
         >
-          <TouchableOpacity activeOpacity={1}>
+          <View style={styles.modalInner}>
             {/* Drag Handle */}
             <View style={styles.handleContainer}>
               <View style={styles.handle} />
@@ -133,6 +135,7 @@ export default function ActivityDetailModal({ activity, goal, onClose, theme = '
               style={styles.content}
               contentContainerStyle={styles.contentContainer}
               scrollEnabled={isExpanded}
+              showsVerticalScrollIndicator={false}
             >
               {/* Date */}
               <Text style={styles.date}>{formatDate(activity.date)}</Text>
@@ -233,9 +236,9 @@ export default function ActivityDetailModal({ activity, goal, onClose, theme = '
                 </View>
               )}
             </ScrollView>
-          </TouchableOpacity>
+          </View>
         </Animated.View>
-      </TouchableOpacity>
+      </View>
     </Modal>
   );
 }
@@ -252,7 +255,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#2a2a2a',
     borderRadius: 24,
     overflow: 'hidden',
-    maxHeight: '85%',
+  },
+  modalExpanded: {
+    height: '85%',
+  },
+  modalCollapsed: {
+    maxHeight: 600,
+  },
+  modalInner: {
+    flex: 1,
   },
   handleContainer: {
     paddingTop: 12,
@@ -281,6 +292,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 24,
     paddingTop: 8,
+    paddingBottom: 40,
   },
   date: {
     fontSize: 24,
