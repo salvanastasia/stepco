@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Image } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, Animated } from 'react-native';
 import { Users, UserPlus, UserCheck, X } from 'lucide-react-native';
 
 interface User {
@@ -19,21 +20,55 @@ interface UserProfileModalProps {
 }
 
 export default function UserProfileModal({ user, onClose, onFriendRequest, onWalkTogether }: UserProfileModalProps) {
+  const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const modalTranslateY = useRef(new Animated.Value(300)).current;
+
+  useEffect(() => {
+    // Sequential animations: first overlay fade in, then modal slide up
+    Animated.sequence([
+      Animated.timing(overlayOpacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.spring(modalTranslateY, {
+        toValue: 0,
+        tension: 80,
+        friction: 10,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
   return (
     <Modal
       visible={true}
       transparent={true}
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
     >
       <View style={styles.backdrop}>
-        <TouchableOpacity
-          style={styles.backdropTouchable}
-          activeOpacity={1}
-          onPress={onClose}
-        />
+        <Animated.View
+          style={[
+            styles.backdropTouchable,
+            { opacity: overlayOpacity },
+          ]}
+        >
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={onClose}
+          />
+        </Animated.View>
         
-        <View style={styles.modal}>
+        <Animated.View
+          style={[
+            styles.modal,
+            {
+              transform: [{ translateY: modalTranslateY }],
+            },
+          ]}
+        >
             <View style={styles.modalBorder} />
 
             <View style={styles.content}>
@@ -135,7 +170,7 @@ export default function UserProfileModal({ user, onClose, onFriendRequest, onWal
                 )}
               </View>
             </View>
-          </View>
+          </Animated.View>
       </View>
     </Modal>
   );

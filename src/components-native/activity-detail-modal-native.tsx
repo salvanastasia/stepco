@@ -17,6 +17,8 @@ interface ActivityDetailModalProps {
 export default function ActivityDetailModal({ activity, goal, onClose, theme = 'bw' }: ActivityDetailModalProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const translateY = useRef(new Animated.Value(0)).current;
+  const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const modalTranslateY = useRef(new Animated.Value(300)).current;
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -96,26 +98,55 @@ export default function ActivityDetailModal({ activity, goal, onClose, theme = '
     })
   ).current;
 
+  // Sequential entry animation
+  useEffect(() => {
+    Animated.sequence([
+      Animated.timing(overlayOpacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.spring(modalTranslateY, {
+        toValue: 0,
+        tension: 80,
+        friction: 10,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
   return (
     <Modal
       visible={true}
       transparent={true}
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
     >
       <View style={styles.backdrop}>
-        <TouchableOpacity
-          style={StyleSheet.absoluteFill}
-          activeOpacity={1}
-          onPress={onClose}
-        />
+        <Animated.View
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              opacity: overlayOpacity,
+            },
+          ]}
+        >
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={onClose}
+          />
+        </Animated.View>
         
         <Animated.View
           style={[
             styles.modal,
             isExpanded ? styles.modalExpanded : styles.modalCollapsed,
             {
-              transform: [{ translateY }],
+              transform: [
+                { translateY: Animated.add(translateY, modalTranslateY) },
+              ],
             },
           ]}
           {...panResponder.panHandlers}
