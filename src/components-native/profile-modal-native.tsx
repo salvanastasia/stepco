@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: '#333333',
-    marginBottom: 48,
+    marginBottom: 32,
   },
   themeSection: {
     flexDirection: 'row',
