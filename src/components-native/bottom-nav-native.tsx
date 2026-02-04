@@ -30,7 +30,7 @@ export default function BottomNav({ currentPage, onPageChange, theme = 'bw' }: B
   return (
     <View style={styles.wrapper}>
       <LinearGradient
-        colors={['#1A1A1A', '#111111']}
+        colors={['rgba(17, 17, 17, 0)', '#111111']}
         style={styles.gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
