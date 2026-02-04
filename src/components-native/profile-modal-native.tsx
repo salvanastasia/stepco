@@ -242,6 +242,7 @@ export default function ProfileModal({
             <X size={24} color={accentColor} strokeWidth={1.5} />
           </TouchableOpacity>
         </View>
+      </Animated.View>
       </TouchableOpacity>
     </TouchableOpacity>
     </Modal>
