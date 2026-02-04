@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     color: '#ffffff',
-    fontFamily: 'Inter',
+    fontFamily: 'System',
     fontWeight: '500',
     lineHeight: 28,
     includeFontPadding: false,
