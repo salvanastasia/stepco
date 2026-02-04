@@ -56,18 +56,7 @@ export default function App() {
     { date: '2026-01-20', steps: 10234 },
   ]);
   
-  const currentPageRef = useRef(currentPage);
   const walkStartTimeRef = useRef<Date | null>(null);
-  
-  // Animation controller for horizontal swipe transitions
-  const translateX = useRef(new Animated.Value(0)).current;
-  
-  useEffect(() => {
-    currentPageRef.current = currentPage;
-  }, [currentPage]);
-
-  // FIXED PAGES ARRAY - Range: 0-3 (4 screens total)
-  const pages: PageType[] = ['home', 'map', 'social', 'profile'];
   
   // Check if pedometer is available
   useEffect(() => {
@@ -323,20 +312,12 @@ export default function App() {
   const accentColor = theme === 'bo' ? '#ff4400' : '#fff';
 
   return (
-    <View style={styles.container} {...panResponder.panHandlers}>
+    <View style={styles.container}>
       <StatusBar style="light" />
       
-      <Animated.View
-        style={[
-          styles.carouselContainer,
-          {
-            width: screenWidth * pages.length,
-            transform: [{ translateX }],
-          },
-        ]}
-      >
-        {/* SCREEN 0: HOME */}
-        <View style={[styles.screen, { width: screenWidth }]} pointerEvents="box-none">
+      {/* Conditional rendering based on currentPage */}
+      {currentPage === 'home' && (
+        <View style={styles.screen}>
           <View style={styles.homeContent}>
             <CircularProgress 
               current={goal - steps} 
@@ -368,19 +349,22 @@ export default function App() {
             )}
           </View>
         </View>
+      )}
 
-        {/* SCREEN 1: MAP */}
-        <View style={[styles.screen, { width: screenWidth }]} pointerEvents="box-none">
+      {currentPage === 'map' && (
+        <View style={styles.screen}>
           <MapView theme={theme} />
         </View>
+      )}
 
-        {/* SCREEN 2: SOCIAL */}
-        <View style={[styles.screen, { width: screenWidth }]} pointerEvents="box-none">
+      {currentPage === 'social' && (
+        <View style={styles.screen}>
           <SocialView theme={theme} />
         </View>
+      )}
 
-        {/* SCREEN 3: PROFILE */}
-        <View style={[styles.screen, { width: screenWidth }]} pointerEvents="box-none">
+      {currentPage === 'profile' && (
+        <View style={styles.screen}>
           <ProfileView 
             walkHistory={walkHistory} 
             goal={goal} 
@@ -389,14 +373,11 @@ export default function App() {
             onThemeChange={setTheme}
           />
         </View>
-      </Animated.View>
+      )}
       
       <BottomNav 
         currentPage={currentPage} 
-        onPageChange={(page) => {
-          const index = pages.indexOf(page);
-          animateToPage(page, index);
-        }} 
+        onPageChange={setCurrentPage} 
         theme={theme}
       />
 

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Image, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
+import UserProfileModal from './user-profile-modal-native';
 
 interface User {
   id: number;
@@ -241,56 +242,20 @@ export default function SocialView({ theme = 'bw' }: SocialViewProps) {
       {/* Header text */}
       <Text style={styles.headerText}>Close to you</Text>
       
-      {/* Simple User Info Modal */}
+      {/* User Profile Modal */}
       {selectedUser && (
-        <Modal
-          visible={true}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setSelectedUser(null)}
-        >
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            activeOpacity={1}
-            onPress={() => setSelectedUser(null)}
-          >
-            <View style={styles.modalContent}>
-              <Image source={selectedUser.avatar} style={styles.modalAvatar} />
-              <Text style={styles.modalName}>{selectedUser.name}</Text>
-              <Text style={styles.modalInfo}>
-                Goal: {selectedUser.goal.toLocaleString('en-US').replace(/,/g, '.')} steps
-              </Text>
-              <Text style={styles.modalInfo}>{selectedUser.walks} walks completed</Text>
-              <TouchableOpacity
-                style={[
-                  styles.modalButton,
-                  {
-                    backgroundColor: selectedUser.isFriend ? '#666666' : accentColor,
-                  },
-                ]}
-                onPress={() => {
-                  handleFriendRequest(selectedUser.id);
-                  setSelectedUser(null);
-                }}
-              >
-                <Text
-                  style={[
-                    styles.modalButtonText,
-                    {
-                      color: selectedUser.isFriend
-                        ? '#ffffff'
-                        : theme === 'bo'
-                        ? '#ffffff'
-                        : '#1a1a1a',
-                    },
-                  ]}
-                >
-                  {selectedUser.isFriend ? 'Remove Friend' : 'Add Friend'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        </Modal>
+        <UserProfileModal
+          user={selectedUser}
+          onClose={() => setSelectedUser(null)}
+          onFriendRequest={handleFriendRequest}
+          onWalkTogether={(userId) => {
+            const user = users.find(u => u.id === userId);
+            if (user) {
+              alert(`Starting a walk with ${user.name}!`);
+              setSelectedUser(null);
+            }
+          }}
+        />
       )}
     </View>
   );
@@ -373,52 +338,6 @@ const styles = StyleSheet.create({
     color: '#bbbbbb',
     fontFamily: 'DMMono_400Regular',
     textAlign: 'center',
-    includeFontPadding: false,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalContent: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: 24,
-    padding: 32,
-    alignItems: 'center',
-    gap: 12,
-    maxWidth: 300,
-    borderWidth: 1,
-    borderColor: '#3a3a3a',
-  },
-  modalAvatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    marginBottom: 8,
-  },
-  modalName: {
-    fontSize: 20,
-    color: '#ffffff',
-    fontFamily: 'JetBrainsMono_600SemiBold',
-    includeFontPadding: false,
-  },
-  modalInfo: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
-    fontFamily: 'JetBrainsMono_400Regular',
-    includeFontPadding: false,
-  },
-  modalButton: {
-    marginTop: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 20,
-  },
-  modalButtonText: {
-    fontSize: 14,
-    fontFamily: 'JetBrainsMono_600SemiBold',
-    textTransform: 'uppercase',
     includeFontPadding: false,
   },
 });
