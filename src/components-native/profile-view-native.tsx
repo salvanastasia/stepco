@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Settings } from 'lucide-react-native';
 import ActivityDetailModal from './activity-detail-modal-native';
 import ProfileModal from './profile-modal-native';
@@ -52,13 +52,13 @@ export default function ProfileView({
         <Text style={styles.title}>Activity</Text>
         <TouchableOpacity
           onPress={() => setShowProfileModal(true)}
-          style={styles.profileButton}
+          style={styles.settingsButton}
         >
-          <Image
-            source={require('../assets/5e57bdbeef9424b6821c727c30e788b8e31d6a71.png')}
-            style={styles.profileImage}
+          <Settings
+            size={24}
+            color={accentColor}
+            strokeWidth={1.5}
           />
-          <View style={styles.profileBorder} />
         </TouchableOpacity>
       </View>
 

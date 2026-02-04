@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Home, Map, Users, User } from 'lucide-react-native';
 
@@ -8,6 +8,7 @@ interface BottomNavProps {
   currentPage: PageType;
   onPageChange: (page: PageType) => void;
   theme?: 'bw' | 'bo';
+  onProfilePress?: () => void;
 }
 
 const getIcon = (page: PageType) => {
@@ -23,7 +24,7 @@ const getIcon = (page: PageType) => {
   }
 };
 
-export default function BottomNav({ currentPage, onPageChange, theme = 'bw' }: BottomNavProps) {
+export default function BottomNav({ currentPage, onPageChange, theme = 'bw', onProfilePress }: BottomNavProps) {
   const pages: PageType[] = ['home', 'map', 'social', 'profile'];
   const accentColor = theme === 'bo' ? '#ff4400' : '#ffffff';
   
@@ -39,6 +40,30 @@ export default function BottomNav({ currentPage, onPageChange, theme = 'bw' }: B
         {pages.map((page) => {
           const Icon = getIcon(page);
           const isActive = currentPage === page;
+          
+          // Special handling for profile tab - show profile picture
+          if (page === 'profile') {
+            return (
+              <TouchableOpacity
+                key={page}
+                onPress={() => {
+                  onPageChange(page);
+                  if (onProfilePress) onProfilePress();
+                }}
+                style={styles.iconButton}
+              >
+                <View style={[
+                  styles.profileImageContainer,
+                  isActive && { borderColor: accentColor, borderWidth: 2 }
+                ]}>
+                  <Image
+                    source={require('../assets/5e57bdbeef9424b6821c727c30e788b8e31d6a71.png')}
+                    style={styles.profileImage}
+                  />
+                </View>
+              </TouchableOpacity>
+            );
+          }
           
           return (
             <TouchableOpacity
@@ -83,5 +108,17 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     padding: 8,
+  },
+  profileImageContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: '#666666',
+  },
+  profileImage: {
+    width: '100%',
+    height: '100%',
   },
 });
