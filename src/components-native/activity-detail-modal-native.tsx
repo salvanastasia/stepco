@@ -293,6 +293,57 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 40,
   },
+  collapsedPreview: {
+    paddingHorizontal: 24,
+    paddingBottom: 32,
+    gap: 24,
+  },
+  collapsedStats: {
+    gap: 16,
+  },
+  collapsedMainStat: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  collapsedStepsValue: {
+    fontSize: 48,
+    fontFamily: 'Archivo_400Regular',
+    color: '#ffffff',
+    lineHeight: 48,
+    includeFontPadding: false,
+  },
+  collapsedStepsLabel: {
+    fontSize: 14,
+    fontFamily: 'JetBrainsMono_400Regular',
+    color: '#999999',
+    lineHeight: 21,
+    includeFontPadding: false,
+  },
+  collapsedSecondaryStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  collapsedSecondaryStat: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+  },
+  collapsedSecondaryValue: {
+    fontSize: 16,
+    fontFamily: 'JetBrainsMono_500Medium',
+    color: '#ffffff',
+    lineHeight: 24,
+    includeFontPadding: false,
+  },
+  collapsedSecondaryLabel: {
+    fontSize: 10,
+    fontFamily: 'JetBrainsMono_400Regular',
+    color: '#999999',
+    lineHeight: 15,
+    textTransform: 'uppercase',
+    includeFontPadding: false,
+  },
   date: {
     fontSize: 16,
     color: '#ffffff',
