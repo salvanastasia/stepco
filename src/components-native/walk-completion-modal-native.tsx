@@ -190,7 +190,8 @@ const styles = StyleSheet.create({
     maxWidth: 393,
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingVertical: 48,
+    paddingTop: 48,
+    paddingBottom: 80,
   },
   statsContainer: {
     width: '100%',
@@ -241,5 +242,6 @@ const styles = StyleSheet.create({
   },
   statTextContainer: {
     flex: 1,
+    flexShrink: 1,
   },
 });
