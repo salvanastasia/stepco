@@ -166,6 +166,20 @@ export default function ProfileModal({
           </BlurView>
         </Animated.View>
         
+        {/* Color reflection blur behind modal */}
+        {isDragging && (
+          <Animated.View
+            style={[
+              styles.reflectionBlur,
+              {
+                opacity: glowOpacity,
+                backgroundColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.4)' : 'rgba(255, 255, 255, 0.3)',
+              },
+            ]}
+            pointerEvents="none"
+          />
+        )}
+
         <Animated.View
           style={[
             styles.modal,
