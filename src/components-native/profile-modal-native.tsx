@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, PanResponder, Animated } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, PanResponder, Animated, ViewStyle } from 'react-native';
 import { X } from 'lucide-react-native';
 
 interface ProfileModalProps {
@@ -21,7 +21,9 @@ export default function ProfileModal({
 }: ProfileModalProps) {
   const [goal, setGoal] = useState(initialGoal);
   const [isDragging, setIsDragging] = useState(false);
+  const [glowPosition, setGlowPosition] = useState({ x: 50, y: 50 });
   const glowOpacity = useRef(new Animated.Value(0)).current;
+  const containerRef = useRef<View>(null);
 
   if (!isOpen) return null;
 
@@ -36,21 +38,17 @@ export default function ProfileModal({
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
+      onPanResponderGrant: (evt) => {
         setIsDragging(true);
+        updateGoalAndGlow(evt);
         Animated.timing(glowOpacity, {
           toValue: 1,
           duration: 150,
           useNativeDriver: false,
         }).start();
       },
-      onPanResponderMove: (evt, gestureState) => {
-        const { locationX } = evt.nativeEvent;
-        const sliderWidth = 345; // Approximate width
-        const percentage = Math.max(0, Math.min(1, locationX / sliderWidth));
-        const newGoal = Math.round(percentage * maxGoal);
-        setGoal(newGoal);
-        onGoalChange(newGoal);
+      onPanResponderMove: (evt) => {
+        updateGoalAndGlow(evt);
       },
       onPanResponderRelease: () => {
         setIsDragging(false);
@@ -62,6 +60,22 @@ export default function ProfileModal({
       },
     })
   ).current;
+
+  const updateGoalAndGlow = (evt: any) => {
+    const { locationX, pageX, pageY } = evt.nativeEvent;
+    const sliderWidth = 345; // Approximate width
+    const percentage = Math.max(0, Math.min(1, locationX / sliderWidth));
+    const newGoal = Math.round(percentage * maxGoal);
+    setGoal(newGoal);
+    onGoalChange(newGoal);
+
+    // Update glow position (percentage-based for container)
+    containerRef.current?.measure((x, y, width, height, pageXContainer, pageYContainer) => {
+      const glowX = ((pageX - pageXContainer) / width) * 100;
+      const glowY = ((pageY - pageYContainer) / height) * 100;
+      setGlowPosition({ x: glowX, y: glowY });
+    });
+  };
 
   return (
     <Modal
@@ -85,31 +99,40 @@ export default function ProfileModal({
             ]}
           >
           <View style={styles.modalBorder} />
-          
-          {/* Glow container with radial gradient */}
-          {isDragging && (
-            <Animated.View
-              style={[
-                styles.glowContainer,
-                {
-                  opacity: glowOpacity,
-                },
-              ]}
-              pointerEvents="none"
-            >
-              <View
-                style={[
-                  styles.radialGlow,
-                  {
-                    backgroundColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.1)' : 'rgba(255, 255, 255, 0.06)',
-                  },
-                ]}
-              />
-            </Animated.View>
-          )}
 
           {/* Handle */}
-          <View style={styles.handle} />
+          <View
+            ref={containerRef}
+            style={[
+              styles.contentContainer,
+              isDragging && styles.contentGlow,
+            ]}
+          >
+            {/* Animated glow effect */}
+            {isDragging && (
+              <Animated.View
+                style={[
+                  styles.glowOverlay,
+                  {
+                    opacity: glowOpacity,
+                  },
+                ]}
+                pointerEvents="none"
+              >
+                <View
+                  style={[
+                    styles.glowCircle,
+                    {
+                      left: `${glowPosition.x}%`,
+                      top: `${glowPosition.y}%`,
+                      backgroundColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.15)' : 'rgba(255, 255, 255, 0.1)',
+                    },
+                  ]}
+                />
+              </Animated.View>
+            )}
+
+            <View style={styles.handle} />
 
           {/* Profile Section */}
           <View style={styles.profileSection}>
@@ -216,9 +239,9 @@ export default function ProfileModal({
 
           {/* Close Button */}
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <X size={24} color={accentColor} strokeWidth={1.5} />
-          </TouchableOpacity>
-        </Animated.View>
+              <X size={24} color={accentColor} strokeWidth={1.5} />
+            </TouchableOpacity>
+          </View>
         </TouchableOpacity>
       </TouchableOpacity>
     </Modal>
@@ -409,7 +432,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  glowContainer: {
+  contentContainer: {
+    gap: 48,
+    paddingTop: 12,
+    paddingBottom: 24,
+    paddingHorizontal: 24,
+    borderRadius: 32,
+    overflow: 'hidden',
+  },
+  contentGlow: {
+    shadowColor: 'rgba(255, 255, 255, 0.04)',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 40,
+  },
+  glowOverlay: {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -419,13 +456,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     pointerEvents: 'none',
   },
-  radialGlow: {
+  glowCircle: {
     position: 'absolute',
     width: 600,
     height: 300,
     borderRadius: 300,
-    top: '50%',
-    left: '50%',
     transform: [{ translateX: -300 }, { translateY: -150 }],
   },
 });
