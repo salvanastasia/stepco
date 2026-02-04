@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Image } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, Animated } from 'react-native';
 import { X } from 'lucide-react-native';
 
 interface FriendInviteModalProps {
@@ -18,24 +19,50 @@ export default function FriendInviteModal({
 }: FriendInviteModalProps) {
   const accentColor = theme === 'bo' ? '#ff4400' : '#ffffff';
   const borderColor = theme === 'bo' ? 'rgba(255, 68, 0, 0.8)' : 'rgba(136, 136, 136, 0.8)';
+  
+  const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const modalTranslateY = useRef(new Animated.Value(300)).current;
+
+  useEffect(() => {
+    // Sequential animations: first overlay fade in, then modal slide up
+    Animated.sequence([
+      Animated.timing(overlayOpacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.spring(modalTranslateY, {
+        toValue: 0,
+        tension: 80,
+        friction: 10,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
   return (
     <Modal
       visible={true}
       transparent={true}
-      animationType="slide"
+      animationType="none"
       onRequestClose={onDecline}
     >
-      <TouchableOpacity
-        style={styles.overlay}
-        activeOpacity={1}
-        onPress={onDecline}
+      <Animated.View
+        style={[styles.overlay, { opacity: overlayOpacity }]}
       >
         <TouchableOpacity
+          style={StyleSheet.absoluteFill}
           activeOpacity={1}
-          style={[styles.modalContent, {
-            shadowColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.3)' : 'rgba(255, 255, 255, 0.1)',
-          }]}
+          onPress={onDecline}
+        />
+        <Animated.View
+          style={[
+            styles.modalContent,
+            {
+              shadowColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.3)' : 'rgba(255, 255, 255, 0.1)',
+              transform: [{ translateY: modalTranslateY }],
+            },
+          ]}
         >
           {/* Close button */}
           <TouchableOpacity
@@ -80,8 +107,8 @@ export default function FriendInviteModal({
               <Text style={[styles.acceptText, { color: theme === 'bo' ? '#fff' : '#1a1a1a' }]}>Accept</Text>
             </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      </TouchableOpacity>
+        </Animated.View>
+      </Animated.View>
     </Modal>
   );
 }

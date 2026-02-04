@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { Settings } from 'lucide-react-native';
 import ActivityDetailModal from './activity-detail-modal-native';
 import ProfileModal from './profile-modal-native';
@@ -19,6 +19,8 @@ interface ProfileViewProps {
   onProfileImageChange?: (image: string) => void;
 }
 
+type ViewType = 'week' | 'year';
+
 export default function ProfileView({
   walkHistory,
   goal,
@@ -30,6 +32,18 @@ export default function ProfileView({
 }: ProfileViewProps) {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<StepRecord | null>(null);
+  const [viewType, setViewType] = useState<ViewType>('week');
+  const sliderPosition = useRef(new Animated.Value(0)).current;
+
+  // Animate slider when view type changes
+  useEffect(() => {
+    Animated.spring(sliderPosition, {
+      toValue: viewType === 'week' ? 0 : 168,
+      tension: 100,
+      friction: 10,
+      useNativeDriver: true,
+    }).start();
+  }, [viewType]);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -49,6 +63,54 @@ export default function ProfileView({
 
   const accentColor = theme === 'bo' ? '#ff4400' : '#ffffff';
 
+  // Generate year view data (Jan 1 - Dec 31 of current year)
+  const generateYearData = () => {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const todayStr = today.toISOString().split('T')[0];
+    const yearData = [];
+    
+    // Start from January 1st of current year
+    const startDate = new Date(currentYear, 0, 1); // Month is 0-indexed
+    
+    // Calculate days in current year (365 or 366 for leap year)
+    const endDate = new Date(currentYear, 11, 31);
+    const daysInYear = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    
+    for (let i = 0; i < daysInYear; i++) {
+      const date = new Date(currentYear, 0, 1 + i);
+      const dateStr = date.toISOString().split('T')[0];
+      
+      // Find matching record in walkHistory
+      const record = walkHistory.find(r => r.date === dateStr);
+      const steps = record ? record.steps : 0;
+      const isToday = dateStr === todayStr;
+      
+      yearData.push({ date: dateStr, steps, isToday });
+    }
+    
+    return yearData;
+  };
+
+  const yearData = generateYearData();
+
+  // Calculate dot opacity based on steps
+  const getDotStyle = (steps: number, isToday: boolean) => {
+    if (isToday) {
+      // Always use orange for current day
+      return { backgroundColor: '#ff4400', opacity: 1 };
+    }
+    
+    if (steps === 0) {
+      return { backgroundColor: '#ffffff', opacity: 0.1 };
+    }
+    
+    const percentage = Math.min(steps / goal, 1.5);
+    const opacity = 0.3 + (percentage * 0.7); // Range from 0.3 to 1.0
+    
+    return { backgroundColor: '#ffffff', opacity: Math.min(opacity, 1) };
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -66,58 +128,112 @@ export default function ProfileView({
         </TouchableOpacity>
       </View>
 
-      {/* History List */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {walkHistory.map((record, index) => {
-          const percentage = Math.round((record.steps / goal) * 100);
-          const isComplete = record.steps >= goal;
+      {/* View Switcher */}
+      <View style={styles.switcherContainer}>
+        <View style={styles.switcherBackground}>
+          <Animated.View
+            style={[
+              styles.sliderBackground,
+              {
+                transform: [{ translateX: sliderPosition }],
+              },
+            ]}
+          />
+          <TouchableOpacity
+            style={styles.switcherButton}
+            onPress={() => setViewType('week')}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.switcherText, viewType === 'week' && styles.switcherTextActive]}>
+              Week
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.switcherButton}
+            onPress={() => setViewType('year')}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.switcherText, viewType === 'year' && styles.switcherTextActive]}>
+              Year
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
-          return (
-            <TouchableOpacity
-              key={index}
-              style={styles.card}
-              activeOpacity={0.7}
-              onPress={() => setSelectedActivity(record)}
-            >
-              <View style={styles.cardBorder} />
-              <View style={styles.cardContent}>
-                <View style={styles.leftContent}>
-                  <Text style={styles.dateText}>{formatDate(record.date)}</Text>
-                  <Text style={styles.stepsText}>{formatSteps(record.steps)} steps</Text>
-                </View>
+      {/* Week View - History List */}
+      {viewType === 'week' && (
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {walkHistory.map((record, index) => {
+            const percentage = Math.round((record.steps / goal) * 100);
+            const isComplete = record.steps >= goal;
 
-                <View style={styles.rightContent}>
-                  <Text
-                    style={[
-                      styles.percentageText,
-                      { color: isComplete ? '#4ade80' : '#999999' },
-                    ]}
-                  >
-                    {percentage}%
-                  </Text>
-                  <View style={styles.progressBarContainer}>
-                    <View
+            return (
+              <TouchableOpacity
+                key={index}
+                style={styles.card}
+                activeOpacity={0.7}
+                onPress={() => setSelectedActivity(record)}
+              >
+                <View style={styles.cardBorder} />
+                <View style={styles.cardContent}>
+                  <View style={styles.leftContent}>
+                    <Text style={styles.dateText}>{formatDate(record.date)}</Text>
+                    <Text style={styles.stepsText}>{formatSteps(record.steps)} steps</Text>
+                  </View>
+
+                  <View style={styles.rightContent}>
+                    <Text
                       style={[
-                        styles.progressBar,
-                        {
-                          width: `${Math.min(percentage, 100)}%`,
-                          backgroundColor: isComplete ? '#4ade80' : accentColor,
-                          borderRadius: percentage < 100 ? 0 : 8,
-                          borderTopLeftRadius: 8,
-                          borderBottomLeftRadius: 8,
-                        },
+                        styles.percentageText,
+                        { color: isComplete ? '#4ade80' : '#999999' },
                       ]}
-                    />
+                    >
+                      {percentage}%
+                    </Text>
+                    <View style={styles.progressBarContainer}>
+                      <View
+                        style={[
+                          styles.progressBar,
+                          {
+                            width: `${Math.min(percentage, 100)}%`,
+                            backgroundColor: isComplete ? '#4ade80' : accentColor,
+                            borderRadius: percentage < 100 ? 0 : 8,
+                            borderTopLeftRadius: 8,
+                            borderBottomLeftRadius: 8,
+                          },
+                        ]}
+                      />
+                    </View>
                   </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      )}
+
+      {/* Year View - Dot Grid */}
+      {viewType === 'year' && (
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.yearScrollContent}
+        >
+          <View style={styles.dotGrid}>
+            {yearData.map((day, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.dot,
+                  getDotStyle(day.steps, day.isToday),
+                ]}
+              />
+            ))}
+          </View>
+        </ScrollView>
+      )}
 
       {/* Profile Modal */}
       {showProfileModal && onThemeChange && (
@@ -128,6 +244,8 @@ export default function ProfileView({
           onGoalChange={onGoalChange}
           theme={theme}
           onThemeChange={onThemeChange}
+          profileImage={profileImage}
+          onProfileImageChange={onProfileImageChange}
         />
       )}
 
@@ -186,6 +304,47 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'rgba(136, 136, 136, 0.8)',
   },
+  settingsButton: {
+    padding: 8,
+  },
+  switcherContainer: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 0,
+  },
+  switcherBackground: {
+    flexDirection: 'row',
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
+    padding: 4,
+    position: 'relative',
+    height: 40,
+  },
+  sliderBackground: {
+    position: 'absolute',
+    top: 4,
+    left: 4,
+    width: 168,
+    height: 32,
+    backgroundColor: '#3a3a3a',
+    borderRadius: 6,
+  },
+  switcherButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  switcherText: {
+    fontSize: 13,
+    fontFamily: 'JetBrainsMono_400Regular',
+    color: '#999999',
+    lineHeight: 18,
+    includeFontPadding: false,
+  },
+  switcherTextActive: {
+    color: '#ffffff',
+  },
   scrollView: {
     flex: 1,
   },
@@ -194,6 +353,24 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 128,
     gap: 8,
+  },
+  yearScrollContent: {
+    paddingHorizontal: 24,
+    paddingTop: 40,
+    paddingBottom: 128,
+    alignItems: 'center',
+  },
+  dotGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    width: 268,
+    gap: 12,
+    alignSelf: 'center',
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   card: {
     backgroundColor: '#2a2a2a',

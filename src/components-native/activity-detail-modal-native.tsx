@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 24,
     paddingTop: 8,
-    paddingBottom: 40,
+    paddingBottom: 100,
   },
   collapsedPreview: {
     paddingHorizontal: 24,
