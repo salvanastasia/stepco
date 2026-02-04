@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, PanResponder, Animated, ViewStyle } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, PanResponder, Animated, ViewStyle, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { X, CheckCircle2 } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { X, CheckCircle2, Camera } from 'lucide-react-native';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -24,6 +25,7 @@ export default function ProfileModal({
   const [goal, setGoal] = useState(initialGoal);
   const [isDragging, setIsDragging] = useState(false);
   const [glowPosition, setGlowPosition] = useState({ x: 50, y: 50 });
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const glowOpacity = useRef(new Animated.Value(0)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
   const modalTranslateY = useRef(new Animated.Value(300)).current;
@@ -62,6 +64,28 @@ export default function ProfileModal({
       useNativeDriver: true,
     }).start();
   }, [theme]);
+
+
+  // Pick image function
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (status !== 'granted') {
+      Alert.alert('Permission needed', 'Sorry, we need camera roll permissions to change your profile picture!');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -215,13 +239,18 @@ export default function ProfileModal({
 
           {/* Profile Section */}
           <View style={styles.profileSection}>
-            <View style={styles.profilePicture}>
-              <Image
-                source={require('../assets/5e57bdbeef9424b6821c727c30e788b8e31d6a71.png')}
-                style={styles.profileImage}
-              />
-              <View style={styles.profileBorder} />
-            </View>
+            <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
+              <View style={styles.profilePicture}>
+                <Image
+                  source={profileImage ? { uri: profileImage } : require('../assets/5e57bdbeef9424b6821c727c30e788b8e31d6a71.png')}
+                  style={styles.profileImage}
+                />
+                <View style={styles.profileBorder} />
+                <View style={styles.cameraIconContainer}>
+                  <Camera size={16} color="#ffffff" strokeWidth={2} />
+                </View>
+              </View>
+            </TouchableOpacity>
 
             <View style={styles.nameWalksSection}>
               <Text style={styles.name}>Steve McQueen</Text>
@@ -399,13 +428,24 @@ const styles = StyleSheet.create({
   },
   profileBorder: {
     position: 'absolute',
-    top: 2,
-    left: 2,
+    top: 0,
+    left: 0,
     right: 0,
     bottom: 0,
     borderRadius: 24,
     borderWidth: 4,
     borderColor: 'rgba(136, 136, 136, 0.8)',
+  },
+  cameraIconContainer: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   name: {
     fontSize: 14,
