@@ -349,11 +349,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderRadius: 100,
     alignSelf: 'center',
-    marginBottom: 48,
+    marginBottom: 32,
   },
   profileSection: {
     alignItems: 'center',
-    marginBottom: 48,
+    gap: 16,
+    marginBottom: 32,
   },
   profilePicture: {
     width: 88,
@@ -399,7 +400,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   goalSection: {
-    marginBottom: 48,
+    marginBottom: 32,
+    gap: 16,
   },
   sectionTitle: {
     fontSize: 14,
@@ -497,7 +499,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   contentContainer: {
-    gap: 48,
     paddingTop: 12,
     paddingBottom: 24,
     paddingHorizontal: 24,
