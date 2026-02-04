@@ -212,7 +212,7 @@ export default function ProfileModal({
               <Text style={styles.name}>Steve McQueen</Text>
               <View style={styles.walksRow}>
                 <Text style={styles.walksText}>7 walks</Text>
-                <CheckCircle2 size={24} color="#ffffff" strokeWidth={1.5} />
+                <CheckCircle2 size={22} color="#ffffff" strokeWidth={1.5} />
               </View>
             </View>
           </View>
@@ -529,8 +529,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   contentContainer: {
-    borderRadius: 32,
-    overflow: 'hidden',
   },
   contentGlow: {
     shadowColor: 'rgba(255, 255, 255, 0.04)',
