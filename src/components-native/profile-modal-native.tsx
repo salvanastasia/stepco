@@ -166,18 +166,53 @@ export default function ProfileModal({
           </BlurView>
         </Animated.View>
         
-        {/* Color reflection blur behind modal */}
+        {/* Color reflection blur behind modal - multiple layers for better effect */}
         {isDragging && (
-          <Animated.View
-            style={[
-              styles.reflectionBlur,
-              {
-                opacity: glowOpacity,
-                backgroundColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.4)' : 'rgba(255, 255, 255, 0.3)',
-              },
-            ]}
-            pointerEvents="none"
-          />
+          <>
+            {/* Outermost glow - very large and diffused */}
+            <Animated.View
+              style={[
+                styles.reflectionBlurOuter,
+                {
+                  opacity: glowOpacity.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, 0.6],
+                  }),
+                },
+              ]}
+              pointerEvents="none"
+            >
+              <View style={[
+                styles.reflectionGlow,
+                {
+                  backgroundColor: theme === 'bo' ? '#ff4400' : '#ffffff',
+                  shadowColor: theme === 'bo' ? '#ff4400' : '#ffffff',
+                }
+              ]} />
+            </Animated.View>
+            
+            {/* Middle glow layer */}
+            <Animated.View
+              style={[
+                styles.reflectionBlurMiddle,
+                {
+                  opacity: glowOpacity.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, 0.4],
+                  }),
+                },
+              ]}
+              pointerEvents="none"
+            >
+              <View style={[
+                styles.reflectionGlow,
+                {
+                  backgroundColor: theme === 'bo' ? '#ff4400' : '#ffffff',
+                  shadowColor: theme === 'bo' ? '#ff4400' : '#ffffff',
+                }
+              ]} />
+            </Animated.View>
+          </>
         )}
 
         <Animated.View
