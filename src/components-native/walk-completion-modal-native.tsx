@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { TreePine, X } from 'lucide-react-native';
 import DissolveCircularProgress from './dissolve-circular-progress-native';
 import { TextReveal } from './text-reveal-native';
@@ -97,14 +98,15 @@ export default function WalkCompletionModal({ steps, goal, onClose, theme = 'bw'
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        {/* Close button */}
-        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <X size={32} color={accentColor} strokeWidth={1.5} />
-        </TouchableOpacity>
+      <BlurView intensity={48} style={styles.overlay} tint="dark">
+        <View style={styles.overlayBackground}>
+          {/* Close button */}
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <X size={32} color={accentColor} strokeWidth={1.5} />
+          </TouchableOpacity>
 
-        {/* Content */}
-        <View style={styles.content}>
+          {/* Content */}
+          <View style={styles.content}>
           {/* Dissolving circular progress */}
           {showProgress && (
             <DissolveCircularProgress
@@ -163,7 +165,8 @@ export default function WalkCompletionModal({ steps, goal, onClose, theme = 'bw'
             </View>
           )}
         </View>
-      </View>
+        </View>
+      </BlurView>
     </Modal>
   );
 }
@@ -171,10 +174,16 @@ export default function WalkCompletionModal({ steps, goal, onClose, theme = 'bw'
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
+  },
+  overlayBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
   },
   closeButton: {
     position: 'absolute',
@@ -234,6 +243,7 @@ const styles = StyleSheet.create({
     fontFamily: 'DMMono_400Regular',
     lineHeight: 26,
     includeFontPadding: false,
+    flexWrap: 'wrap',
   },
   statTextContainer: {
     flex: 1,

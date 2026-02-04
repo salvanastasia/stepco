@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, PanResponder, Animated, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { X, CheckCircle2 } from 'lucide-react-native';
 
 interface ProfileModalProps {
@@ -127,19 +126,16 @@ export default function ProfileModal({
           style={[
             StyleSheet.absoluteFill,
             {
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
               opacity: overlayOpacity,
             },
           ]}
         >
-          <BlurView intensity={48} style={StyleSheet.absoluteFill} tint="dark">
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0, 0, 0, 0.4)' }]}>
-              <TouchableOpacity
-                style={StyleSheet.absoluteFill}
-                activeOpacity={1}
-                onPress={onClose}
-              />
-            </View>
-          </BlurView>
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={onClose}
+          />
         </Animated.View>
         
         <Animated.View
