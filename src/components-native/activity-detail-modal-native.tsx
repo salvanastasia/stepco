@@ -134,17 +134,46 @@ export default function ActivityDetailModal({ activity, goal, onClose, theme = '
               </TouchableOpacity>
             </View>
 
-            <ScrollView
-              style={styles.content}
-              contentContainerStyle={styles.contentContainer}
-              scrollEnabled={isExpanded}
-              showsVerticalScrollIndicator={false}
-            >
-              {/* Date */}
-              <Text style={styles.date}>{formatDate(activity.date)}</Text>
+            {!isExpanded ? (
+              /* Collapsed Preview */
+              <View style={styles.collapsedPreview}>
+                <Text style={styles.date}>{formatDate(activity.date)}</Text>
+                
+                <View style={styles.collapsedStats}>
+                  <View style={styles.collapsedMainStat}>
+                    <Text style={styles.collapsedStepsValue}>{formatSteps(activity.steps)}</Text>
+                    <Text style={styles.collapsedStepsLabel}>steps</Text>
+                  </View>
+                  
+                  <View style={styles.collapsedSecondaryStats}>
+                    <View style={styles.collapsedSecondaryStat}>
+                      <Text style={styles.collapsedSecondaryValue}>{distanceKm} km</Text>
+                      <Text style={styles.collapsedSecondaryLabel}>distance</Text>
+                    </View>
+                    <View style={styles.collapsedSecondaryStat}>
+                      <Text style={styles.collapsedSecondaryValue}>{calories} kcal</Text>
+                      <Text style={styles.collapsedSecondaryLabel}>calories</Text>
+                    </View>
+                    <View style={styles.collapsedSecondaryStat}>
+                      <Text style={styles.collapsedSecondaryValue}>
+                        {hours > 0 ? `${hours}h ${minutes}m` : `${minutes}min`}
+                      </Text>
+                      <Text style={styles.collapsedSecondaryLabel}>duration</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            ) : (
+              <ScrollView
+                style={styles.content}
+                contentContainerStyle={styles.contentContainer}
+                scrollEnabled={true}
+                showsVerticalScrollIndicator={false}
+              >
+                {/* Date */}
+                <Text style={styles.date}>{formatDate(activity.date)}</Text>
 
-              {/* Map Section - Only visible when expanded */}
-              {isExpanded && (
+                {/* Map Section - Only visible when expanded */}
                 <View style={styles.mapSection}>
                   <View style={styles.mapCard}>
                     <View style={styles.mapCardBorder} />
