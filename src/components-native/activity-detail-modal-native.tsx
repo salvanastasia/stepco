@@ -218,9 +218,8 @@ export default function ActivityDetailModal({ activity, goal, onClose, theme = '
                     </View>
                   </View>
                 </View>
-              )}
 
-              {/* Main Stats Card */}
+                {/* Main Stats Card */}
               <View style={styles.mainCard}>
                 {/* Steps */}
                 <View style={styles.stepsSection}>
