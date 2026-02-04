@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Settings } from 'lucide-react-native';
+import ActivityDetailModal from './activity-detail-modal-native';
+import ProfileModal from './profile-modal-native';
 
 interface StepRecord {
   date: string;
@@ -22,7 +24,8 @@ export default function ProfileView({
   theme = 'bw',
   onThemeChange,
 }: ProfileViewProps) {
-  const [showModal, setShowModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<StepRecord | null>(null);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -48,7 +51,7 @@ export default function ProfileView({
       <View style={styles.header}>
         <Text style={styles.title}>Activity</Text>
         <TouchableOpacity
-          onPress={() => setShowModal(!showModal)}
+          onPress={() => setShowProfileModal(true)}
           style={styles.profileButton}
         >
           <Image
@@ -69,7 +72,12 @@ export default function ProfileView({
           const isComplete = record.steps >= goal;
 
           return (
-            <TouchableOpacity key={index} style={styles.card} activeOpacity={0.7}>
+            <TouchableOpacity
+              key={index}
+              style={styles.card}
+              activeOpacity={0.7}
+              onPress={() => setSelectedActivity(record)}
+            >
               <View style={styles.cardBorder} />
               <View style={styles.cardContent}>
                 <View style={styles.leftContent}>
@@ -106,6 +114,28 @@ export default function ProfileView({
           );
         })}
       </ScrollView>
+
+      {/* Profile Modal */}
+      {showProfileModal && onThemeChange && (
+        <ProfileModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          initialGoal={goal}
+          onGoalChange={onGoalChange}
+          theme={theme}
+          onThemeChange={onThemeChange}
+        />
+      )}
+
+      {/* Activity Detail Modal */}
+      {selectedActivity && (
+        <ActivityDetailModal
+          activity={selectedActivity}
+          goal={goal}
+          onClose={() => setSelectedActivity(null)}
+          theme={theme}
+        />
+      )}
     </View>
   );
 }
