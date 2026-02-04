@@ -98,7 +98,7 @@ export default function WalkCompletionModal({ steps, goal, onClose, theme = 'bw'
       animationType="fade"
       onRequestClose={onClose}
     >
-      <BlurView intensity={48} style={styles.overlay} tint="dark">
+      <BlurView intensity={48} style={StyleSheet.absoluteFill} tint="dark">
         <View style={styles.overlayBackground}>
           {/* Close button */}
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -172,12 +172,6 @@ export default function WalkCompletionModal({ steps, goal, onClose, theme = 'bw'
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-  },
   overlayBackground: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
@@ -195,7 +189,8 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 393,
     alignItems: 'center',
-    padding: 48,
+    paddingHorizontal: 24,
+    paddingVertical: 48,
   },
   statsContainer: {
     width: '100%',
@@ -224,7 +219,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 12,
-    paddingHorizontal: 16,
   },
   statEmoji: {
     fontSize: 20,
