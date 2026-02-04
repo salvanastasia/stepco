@@ -53,7 +53,7 @@ export default function ProfileModal({
 
   if (!isOpen) return null;
 
-  const totalBars = 23;
+  const totalBars = 25;
   const maxGoal = 10000;
   const filledBars = Math.round((goal / maxGoal) * totalBars);
 
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderRadius: 100,
     alignSelf: 'center',
-    marginBottom: 32,
+    marginBottom: 48,
   },
   profileSection: {
     alignItems: 'center',
@@ -411,14 +411,13 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
   },
   goalSection: {
-    marginBottom: 32,
+    marginBottom: 48,
     gap: 16,
   },
   sectionTitle: {
     fontSize: 14,
     color: '#bbbbbb',
     fontFamily: 'DMMono_400Regular',
-    marginBottom: 16,
     includeFontPadding: false,
   },
   goalContent: {
@@ -428,6 +427,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    width: '100%',
   },
   stepsLabel: {
     fontSize: 14,
@@ -443,10 +443,10 @@ const styles = StyleSheet.create({
   },
   sliderContainer: {
     flexDirection: 'row',
-    gap: 9,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
     height: 32,
+    width: '100%',
     position: 'relative',
   },
   sliderGlow: {
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: '#333333',
-    marginBottom: 32,
+    marginBottom: 48,
   },
   themeSection: {
     flexDirection: 'row',
