@@ -1,12 +1,14 @@
 {
   "expo": {
     "name": "Stepco",
-    "slug": "stepco",
+    "slug": "stepco-ryd",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "scheme": "stepco",
+    "icon": "./assets/icon.png",
     "splash": {
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#1a1a1a"
     },
@@ -14,7 +16,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.stepco.app",
       "infoPlist": {
-        "NSMotionUsageDescription": "This app uses the pedometer to track your steps during walks."
+        "NSMotionUsageDescription": "This app uses the pedometer to track your steps during walks.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -23,7 +26,11 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "ACTIVITY_RECOGNITION"
-      ]
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1a1a1a"
+      }
     },
     "plugins": [
       [
@@ -40,6 +47,12 @@
       ],
       "expo-asset",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e5d488c6-d633-4319-a304-e6c2c0eee8a8"
+      }
+    },
+    "owner": "salvvv"
   }
 }
