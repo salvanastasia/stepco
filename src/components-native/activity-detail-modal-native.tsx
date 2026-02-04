@@ -202,25 +202,6 @@ export default function ActivityDetailModal({ activity, goal, onClose, theme = '
                 </View>
               </View>
 
-              {isExpanded && (
-                <View style={styles.expandedContent}>
-                  <Text style={styles.sectionTitle}>ACHIEVEMENTS</Text>
-                  {isComplete && (
-                    <View style={styles.achievementCard}>
-                      <View style={styles.cardBorder} />
-                      <View style={styles.achievementContent}>
-                        <Text style={styles.achievementEmoji}>🎯</Text>
-                        <View style={styles.achievementText}>
-                          <Text style={styles.achievementTitle}>Goal Reached!</Text>
-                          <Text style={styles.achievementDesc}>
-                            You completed your daily goal
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  )}
-                </View>
-              )}
             </ScrollView>
           </View>
         </Animated.View>
@@ -404,47 +385,6 @@ const styles = StyleSheet.create({
     color: '#999999',
     fontFamily: 'JetBrainsMono_400Regular',
     lineHeight: 15,
-    includeFontPadding: false,
-  },
-  expandedContent: {
-    marginTop: 24,
-  },
-  sectionTitle: {
-    fontSize: 12,
-    color: '#999999',
-    fontFamily: 'DMMono_400Regular',
-    marginBottom: 12,
-    letterSpacing: 1,
-    includeFontPadding: false,
-  },
-  achievementCard: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    position: 'relative',
-  },
-  achievementContent: {
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  achievementEmoji: {
-    fontSize: 32,
-  },
-  achievementText: {
-    flex: 1,
-  },
-  achievementTitle: {
-    fontSize: 16,
-    color: '#ffffff',
-    fontFamily: 'JetBrainsMono_600SemiBold',
-    marginBottom: 4,
-    includeFontPadding: false,
-  },
-  achievementDesc: {
-    fontSize: 12,
-    color: '#999999',
-    fontFamily: 'DMMono_400Regular',
     includeFontPadding: false,
   },
 });
