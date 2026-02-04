@@ -136,8 +136,8 @@ export default function UserProfileModal({ user, onClose, onFriendRequest, onWal
               </View>
             </View>
           </View>
-        </TouchableOpacity>
-      </TouchableOpacity>
+        </View>
+      </View>
     </Modal>
   );
 }
