@@ -1,4 +1,5 @@
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { Home, Map, Users, User } from 'lucide-react-native';
 
 type PageType = 'home' | 'map' | 'social' | 'profile';
 
@@ -8,24 +9,43 @@ interface BottomNavProps {
   theme?: 'bw' | 'bo';
 }
 
+const getIcon = (page: PageType) => {
+  switch (page) {
+    case 'home':
+      return Home;
+    case 'map':
+      return Map;
+    case 'social':
+      return Users;
+    case 'profile':
+      return User;
+  }
+};
+
 export default function BottomNav({ currentPage, onPageChange, theme = 'bw' }: BottomNavProps) {
   const pages: PageType[] = ['home', 'map', 'social', 'profile'];
   const accentColor = theme === 'bo' ? '#ff4400' : '#ffffff';
   
   return (
     <View style={styles.container}>
-      {pages.map((page) => (
-        <TouchableOpacity
-          key={page}
-          onPress={() => onPageChange(page)}
-          style={[
-            styles.dot,
-            {
-              backgroundColor: currentPage === page ? accentColor : '#666666',
-            },
-          ]}
-        />
-      ))}
+      {pages.map((page) => {
+        const Icon = getIcon(page);
+        const isActive = currentPage === page;
+        
+        return (
+          <TouchableOpacity
+            key={page}
+            onPress={() => onPageChange(page)}
+            style={styles.iconButton}
+          >
+            <Icon
+              size={24}
+              color={isActive ? accentColor : '#666666'}
+              strokeWidth={isActive ? 2 : 1.5}
+            />
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
@@ -39,11 +59,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
+    gap: 24,
   },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 0, // Square dots like in original
+  iconButton: {
+    padding: 8,
   },
 });
