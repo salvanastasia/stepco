@@ -66,6 +66,11 @@ export default function SocialView({ theme = 'bw' }: SocialViewProps) {
   
   const centerPulse = useRef(new Animated.Value(1)).current;
 
+  // Circle light-up animations (0 = original, 1 = lit up)
+  const circle1Light = useRef(new Animated.Value(0)).current;
+  const circle2Light = useRef(new Animated.Value(0)).current;
+  const circle3Light = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     // Create continuous radar pulse animations with staggered timing
     const createPulseAnimation = (
@@ -126,6 +131,54 @@ export default function SocialView({ theme = 'bw' }: SocialViewProps) {
         }),
       ])
     ).start();
+
+    // Sequential circle light-up animation
+    const lightUpDuration = 400;
+    const lightDownDuration = 400;
+    const pauseBetween = 200;
+
+    Animated.loop(
+      Animated.sequence([
+        // Light up circle 1 (inner)
+        Animated.timing(circle1Light, {
+          toValue: 1,
+          duration: lightUpDuration,
+          useNativeDriver: false,
+        }),
+        Animated.timing(circle1Light, {
+          toValue: 0,
+          duration: lightDownDuration,
+          useNativeDriver: false,
+        }),
+        Animated.delay(pauseBetween),
+        
+        // Light up circle 2 (middle)
+        Animated.timing(circle2Light, {
+          toValue: 1,
+          duration: lightUpDuration,
+          useNativeDriver: false,
+        }),
+        Animated.timing(circle2Light, {
+          toValue: 0,
+          duration: lightDownDuration,
+          useNativeDriver: false,
+        }),
+        Animated.delay(pauseBetween),
+        
+        // Light up circle 3 (outer)
+        Animated.timing(circle3Light, {
+          toValue: 1,
+          duration: lightUpDuration,
+          useNativeDriver: false,
+        }),
+        Animated.timing(circle3Light, {
+          toValue: 0,
+          duration: lightDownDuration,
+          useNativeDriver: false,
+        }),
+        Animated.delay(1000), // Longer pause before loop restarts
+      ])
+    ).start();
   }, []);
 
   const handleFriendRequest = (userId: number) => {
@@ -135,6 +188,22 @@ export default function SocialView({ theme = 'bw' }: SocialViewProps) {
   };
 
   const accentColor = theme === 'bo' ? '#ff4400' : '#ffffff';
+
+  // Interpolate fill colors for light-up effect
+  const circle1Fill = circle1Light.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['rgba(26, 26, 26, 0.7)', 'rgba(51, 51, 51, 0.3)'],
+  });
+
+  const circle2Fill = circle2Light.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['rgba(26, 26, 26, 0.7)', 'rgba(51, 51, 51, 0.3)'],
+  });
+
+  const circle3Fill = circle3Light.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['rgba(26, 26, 26, 0.7)', 'rgba(51, 51, 51, 0.3)'],
+  });
 
   return (
     <View style={styles.container}>
@@ -149,13 +218,13 @@ export default function SocialView({ theme = 'bw' }: SocialViewProps) {
         ]}
       >
         <Svg width={932} height={932} style={styles.svg}>
-          <Circle
+          <AnimatedCircle
             cx={466}
             cy={466}
             r={465}
             stroke="#333333"
             strokeWidth={1}
-            fill="rgba(26, 26, 26, 0.7)"
+            fill={circle3Fill}
           />
         </Svg>
       </Animated.View>
@@ -171,13 +240,13 @@ export default function SocialView({ theme = 'bw' }: SocialViewProps) {
         ]}
       >
         <Svg width={621} height={621} style={styles.svg}>
-          <Circle
+          <AnimatedCircle
             cx={310.5}
             cy={310.5}
             r={310}
             stroke="#333333"
             strokeWidth={1}
-            fill="rgba(26, 26, 26, 0.7)"
+            fill={circle2Fill}
           />
         </Svg>
       </Animated.View>
@@ -193,13 +262,13 @@ export default function SocialView({ theme = 'bw' }: SocialViewProps) {
         ]}
       >
         <Svg width={414} height={414} style={styles.svg}>
-          <Circle
+          <AnimatedCircle
             cx={207}
             cy={207}
             r={206.5}
             stroke="#333333"
             strokeWidth={1}
-            fill="rgba(26, 26, 26, 0.7)"
+            fill={circle1Fill}
           />
         </Svg>
       </Animated.View>
