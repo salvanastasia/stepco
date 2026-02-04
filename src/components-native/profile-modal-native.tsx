@@ -239,11 +239,11 @@ export default function ProfileModal({
 
           {/* Close Button */}
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <X size={24} color={accentColor} strokeWidth={1.5} />
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
+            <X size={24} color={accentColor} strokeWidth={1.5} />
+          </TouchableOpacity>
+        </View>
       </TouchableOpacity>
+    </TouchableOpacity>
     </Modal>
   );
 }
