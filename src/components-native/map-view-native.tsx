@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform, View, Text } from 'react-native';
 import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from 'react-native-maps';
 
 interface MapViewProps {
@@ -6,6 +6,15 @@ interface MapViewProps {
 }
 
 export default function MapViewComponent({ theme = 'bw' }: MapViewProps) {
+  // Web doesn't support react-native-maps, show placeholder
+  if (Platform.OS === 'web') {
+    return (
+      <View style={[styles.map, styles.webPlaceholder]}>
+        <Text style={styles.webText}>Map view (mobile only)</Text>
+      </View>
+    );
+  }
+
   // Default location (NYC)
   const initialRegion = {
     latitude: 40.7580,
@@ -141,5 +150,15 @@ const darkMapStyle = [
 const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  webPlaceholder: {
+    backgroundColor: '#2a2a2a',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  webText: {
+    color: '#999',
+    fontSize: 16,
+    fontFamily: 'JetBrainsMono_400Regular',
   },
 });

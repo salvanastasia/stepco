@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated, Platform } from 'react-native';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import { X } from 'lucide-react-native';
 
@@ -99,6 +99,11 @@ export default function FriendFindingView({ friendName, friendAvatar, onClose, t
       <View style={styles.container}>
         {/* Top Half - Map */}
         <View style={styles.mapContainer}>
+          {Platform.OS === 'web' ? (
+            <View style={[styles.map, styles.webPlaceholder]}>
+              <Text style={styles.webText}>Map (mobile only)</Text>
+            </View>
+          ) : (
           <MapView
             style={styles.map}
             provider={PROVIDER_DEFAULT}
@@ -124,6 +129,7 @@ export default function FriendFindingView({ friendName, friendAvatar, onClose, t
               <View style={[styles.friendMarker, { borderColor: accentColor }]} />
             </Marker>
           </MapView>
+          )}
         </View>
 
         {/* Bottom Half - Finding Interface */}
@@ -179,6 +185,16 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  webPlaceholder: {
+    backgroundColor: '#2a2a2a',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  webText: {
+    color: '#999',
+    fontSize: 16,
+    fontFamily: 'JetBrainsMono_400Regular',
   },
   userMarker: {
     width: 40,
