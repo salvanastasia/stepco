@@ -355,8 +355,8 @@ const styles = StyleSheet.create({
   },
   modalBorder: {
     position: 'absolute',
-    top: 0,
-    left: 0,
+    top: 2,
+    left: 2,
     right: 0,
     bottom: 0,
     borderRadius: 32,
@@ -395,8 +395,8 @@ const styles = StyleSheet.create({
   },
   profileBorder: {
     position: 'absolute',
-    top: 0,
-    left: 0,
+    top: 2,
+    left: 2,
     right: 0,
     bottom: 0,
     borderRadius: 24,
@@ -508,8 +508,8 @@ const styles = StyleSheet.create({
     height: 32,
     backgroundColor: '#2a2a2a',
     borderRadius: 8,
-    left: 0,
-    top: 0,
+    left: 2,
+    top: 2,
     zIndex: 0,
   },
   themeButton: {
@@ -561,8 +561,8 @@ const styles = StyleSheet.create({
   },
   glowOverlay: {
     position: 'absolute',
-    top: 0,
-    left: 0,
+    top: 2,
+    left: 2,
     right: 0,
     bottom: 0,
     borderRadius: 32,
