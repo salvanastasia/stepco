@@ -502,16 +502,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333333',
   },
-  themeSlider: {
-    position: 'absolute',
-    width: 80,
-    height: 32,
-    backgroundColor: '#2a2a2a',
-    borderRadius: 8,
-    left: 0,
-    top: 0,
-    zIndex: 0,
-  },
   themeButton: {
     width: 80,
     height: 32,
@@ -520,7 +510,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1,
+  },
+  themeButtonActive: {
+    backgroundColor: '#2a2a2a',
   },
   themeButtonInner: {
     flexDirection: 'row',
