@@ -143,6 +143,23 @@ export default function ActivityDetailModal({ activity, goal, onClose, theme = '
               {/* Date */}
               <Text style={styles.date}>{formatDate(activity.date)}</Text>
 
+              {/* Map Section - Only visible when expanded */}
+              {isExpanded && (
+                <View style={styles.mapSection}>
+                  <View style={styles.mapCard}>
+                    <View style={styles.mapCardBorder} />
+                    <View style={styles.mapContainer}>
+                      <View style={styles.mapPlaceholder}>
+                        <Text style={styles.mapPlaceholderText}>Walk Route Map</Text>
+                        <Text style={styles.mapPlaceholderSubtext}>
+                          {distanceKm} km • {hours > 0 ? `${hours}h ${minutes}m` : `${minutes}min`}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              )}
+
               {/* Main Stats Card */}
               <View style={styles.mainCard}>
                 {/* Steps */}
@@ -385,6 +402,50 @@ const styles = StyleSheet.create({
     color: '#999999',
     fontFamily: 'JetBrainsMono_400Regular',
     lineHeight: 15,
+    includeFontPadding: false,
+  },
+  mapSection: {
+    marginBottom: 24,
+  },
+  mapCard: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: 16,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  mapCardBorder: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 16,
+    borderWidth: 0.615,
+    borderColor: '#3a3a3a',
+    pointerEvents: 'none',
+  },
+  mapContainer: {
+    padding: 16,
+  },
+  mapPlaceholder: {
+    height: 201,
+    borderRadius: 10,
+    backgroundColor: '#1a1a1a',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  mapPlaceholderText: {
+    fontSize: 16,
+    color: '#999999',
+    fontFamily: 'JetBrainsMono_400Regular',
+    marginBottom: 8,
+    includeFontPadding: false,
+  },
+  mapPlaceholderSubtext: {
+    fontSize: 12,
+    color: '#666666',
+    fontFamily: 'JetBrainsMono_400Regular',
     includeFontPadding: false,
   },
 });
