@@ -529,9 +529,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   contentContainer: {
-    paddingTop: 12,
-    paddingBottom: 24,
-    paddingHorizontal: 24,
     borderRadius: 32,
     overflow: 'hidden',
   },
