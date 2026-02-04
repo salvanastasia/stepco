@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, PanResponder, Animated, ViewStyle } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { X } from 'lucide-react-native';
 
 interface ProfileModalProps {
@@ -144,7 +145,7 @@ export default function ProfileModal({
               isDragging && styles.contentGlow,
             ]}
           >
-            {/* Animated glow effect */}
+            {/* Animated radial glow effect - simulated with concentric circles */}
             {isDragging && (
               <Animated.View
                 style={[
@@ -155,16 +156,43 @@ export default function ProfileModal({
                 ]}
                 pointerEvents="none"
               >
+                {/* Outer glow (transparent at 50%) */}
                 <View
                   style={[
-                    styles.glowCircle,
+                    styles.glowEllipse,
                     {
                       left: `${glowPosition.x}%`,
                       top: `${glowPosition.y}%`,
-                      backgroundColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.15)' : 'rgba(255, 255, 255, 0.1)',
+                      width: 600,
+                      height: 300,
+                      backgroundColor: 'transparent',
                     },
                   ]}
-                />
+                >
+                  {/* Middle glow (4% opacity at 25%) */}
+                  <View
+                    style={[
+                      styles.glowEllipseInner,
+                      {
+                        width: 300,
+                        height: 150,
+                        backgroundColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.04)' : 'rgba(255, 255, 255, 0.02)',
+                      },
+                    ]}
+                  >
+                    {/* Inner glow (10% opacity at 0%) */}
+                    <View
+                      style={[
+                        styles.glowEllipseCenter,
+                        {
+                          width: 150,
+                          height: 75,
+                          backgroundColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.1)' : 'rgba(255, 255, 255, 0.06)',
+                        },
+                      ]}
+                    />
+                  </View>
+                </View>
               </Animated.View>
             )}
 
@@ -492,11 +520,19 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     pointerEvents: 'none',
   },
-  glowCircle: {
+  glowEllipse: {
     position: 'absolute',
-    width: 600,
-    height: 300,
     borderRadius: 300,
     transform: [{ translateX: -300 }, { translateY: -150 }],
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  glowEllipseInner: {
+    borderRadius: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  glowEllipseCenter: {
+    borderRadius: 75,
   },
 });
