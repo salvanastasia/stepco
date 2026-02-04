@@ -208,10 +208,12 @@ export default function ProfileModal({
               <View style={styles.profileBorder} />
             </View>
 
-            <Text style={styles.name}>Steve McQueen</Text>
-            <View style={styles.walksRow}>
-              <Text style={styles.walksText}>7 walks</Text>
-              <CheckCircle2 size={24} color="#ffffff" strokeWidth={1.5} />
+            <View style={styles.nameWalksSection}>
+              <Text style={styles.name}>Steve McQueen</Text>
+              <View style={styles.walksRow}>
+                <Text style={styles.walksText}>7 walks</Text>
+                <CheckCircle2 size={24} color="#ffffff" strokeWidth={1.5} />
+              </View>
             </View>
           </View>
 
@@ -358,14 +360,18 @@ const styles = StyleSheet.create({
   profileSection: {
     alignItems: 'center',
     gap: 16,
-    marginBottom: 32,
+    marginBottom: 48,
   },
   profilePicture: {
     width: 88,
     height: 88,
     borderRadius: 24,
-    marginBottom: 16,
     position: 'relative',
+  },
+  nameWalksSection: {
+    gap: 4,
+    alignItems: 'center',
+    width: '100%',
   },
   profileImage: {
     width: '100%',
@@ -386,18 +392,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#ffffff',
     fontFamily: 'DMMono_400Regular',
-    marginBottom: 4,
+    textAlign: 'center',
+    width: '100%',
     includeFontPadding: false,
   },
   walksRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 8,
+    width: '100%',
   },
   walksText: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.75)',
     fontFamily: 'DMMono_400Regular',
+    textAlign: 'center',
     includeFontPadding: false,
   },
   goalSection: {
@@ -470,17 +480,18 @@ const styles = StyleSheet.create({
   },
   themeToggle: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
     backgroundColor: '#1a1a1a',
     borderRadius: 12,
     padding: 4,
   },
   themeButton: {
     flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 8,
     backgroundColor: 'transparent',
+    minWidth: 100,
   },
   themeButtonActive: {
     backgroundColor: '#2a2a2a',
