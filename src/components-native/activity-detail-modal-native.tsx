@@ -126,10 +126,13 @@ export default function ActivityDetailModal({ activity, goal, onClose, theme = '
               <View style={styles.handle} />
             </View>
 
-            {/* Close Button */}
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <X size={24} color={accentColor} strokeWidth={1.5} />
-            </TouchableOpacity>
+            {/* Header with title and close button */}
+            <View style={styles.header}>
+              <Text style={styles.title}>Activity Details</Text>
+              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <X size={24} color="rgba(255, 255, 255, 0.6)" strokeWidth={1.5} />
+              </TouchableOpacity>
+            </View>
 
             <ScrollView
               style={styles.content}
@@ -277,13 +280,25 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 2,
+    borderRadius: 100,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 16,
+  },
+  title: {
+    fontSize: 20,
+    color: '#ffffff',
+    fontFamily: 'Inter',
+    fontWeight: '500',
+    lineHeight: 28,
+    includeFontPadding: false,
   },
   closeButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    zIndex: 10,
     width: 40,
     height: 40,
     alignItems: 'center',
@@ -298,9 +313,10 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   date: {
-    fontSize: 24,
+    fontSize: 16,
     color: '#ffffff',
-    fontFamily: 'JetBrainsMono_600SemiBold',
+    fontFamily: 'JetBrainsMono_400Regular',
+    lineHeight: 24,
     marginBottom: 24,
     includeFontPadding: false,
   },

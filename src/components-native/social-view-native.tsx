@@ -367,6 +367,8 @@ const styles = StyleSheet.create({
   headerText: {
     position: 'absolute',
     top: 72,
+    left: '50%',
+    transform: [{ translateX: -50 }],
     fontSize: 14,
     color: '#bbbbbb',
     fontFamily: 'DMMono_400Regular',

@@ -70,24 +70,43 @@ export default function ProfileModal({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.backdrop}>
+      <TouchableOpacity
+        style={styles.backdrop}
+        activeOpacity={1}
+        onPress={onClose}
+      >
         <TouchableOpacity
-          style={styles.backdropTouchable}
           activeOpacity={1}
-          onPress={onClose}
-        />
-
-        <Animated.View
-          style={[
-            styles.modal,
-            isDragging && {
-              backgroundColor: theme === 'bo'
-                ? 'rgba(17, 17, 17, 1)'
-                : '#111111',
-            },
-          ]}
+          onPress={(e) => e.stopPropagation()}
         >
+          <Animated.View
+            style={[
+              styles.modal,
+            ]}
+          >
           <View style={styles.modalBorder} />
+          
+          {/* Glow container with radial gradient */}
+          {isDragging && (
+            <Animated.View
+              style={[
+                styles.glowContainer,
+                {
+                  opacity: glowOpacity,
+                },
+              ]}
+              pointerEvents="none"
+            >
+              <View
+                style={[
+                  styles.radialGlow,
+                  {
+                    backgroundColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.1)' : 'rgba(255, 255, 255, 0.06)',
+                  },
+                ]}
+              />
+            </Animated.View>
+          )}
 
           {/* Handle */}
           <View style={styles.handle} />
@@ -200,7 +219,8 @@ export default function ProfileModal({
             <X size={24} color={accentColor} strokeWidth={1.5} />
           </TouchableOpacity>
         </Animated.View>
-      </View>
+        </TouchableOpacity>
+      </TouchableOpacity>
     </Modal>
   );
 }
@@ -210,15 +230,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingBottom: 24,
-  },
-  backdropTouchable: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
   },
   modal: {
     backgroundColor: '#111111',
@@ -394,5 +408,28 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  glowContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 32,
+    overflow: 'hidden',
+    pointerEvents: 'none',
+  },
+  radialGlow: {
+    position: 'absolute',
+    width: 600,
+    height: 300,
+    borderRadius: 300,
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -300 }, { translateY: -150 }],
+    shadowColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.08)' : 'rgba(255, 255, 255, 0.04)',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 40,
   },
 });
