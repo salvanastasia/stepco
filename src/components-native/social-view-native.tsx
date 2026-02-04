@@ -208,7 +208,7 @@ export default function SocialView({ theme = 'bw' }: SocialViewProps) {
         style={[
           styles.centerDot,
           {
-            backgroundColor: accentColor,
+            backgroundColor: '#ff4400',
             transform: [{ scale: centerPulse }],
           },
         ]}
@@ -219,7 +219,7 @@ export default function SocialView({ theme = 'bw' }: SocialViewProps) {
         style={[
           styles.centerGlow,
           {
-            backgroundColor: theme === 'bo' ? 'rgba(255, 68, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)',
+            backgroundColor: 'rgba(255, 68, 0, 0.3)',
             transform: [{ scale: centerPulse }],
           },
         ]}
@@ -313,10 +313,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   centerDot: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2.5,
+    width: 19.994,
+    height: 19.994,
+    borderRadius: 9.997,
+    borderWidth: 2.461,
     borderColor: '#ffffff',
     position: 'absolute',
     shadowColor: 'rgba(66, 133, 244, 0.5)',
@@ -328,8 +328,9 @@ const styles = StyleSheet.create({
   centerGlow: {
     width: 24,
     height: 24,
-    borderRadius: 12,
+    borderRadius: 2000,
     position: 'absolute',
+    shadowColor: 'rgba(255, 68, 0, 0.6)',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 1,
     shadowRadius: 20,
