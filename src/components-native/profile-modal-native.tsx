@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, PanResponder, Animated, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { X } from 'lucide-react-native';
+import { X, CheckCircle2 } from 'lucide-react-native';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -211,7 +211,7 @@ export default function ProfileModal({
             <Text style={styles.name}>Steve McQueen</Text>
             <View style={styles.walksRow}>
               <Text style={styles.walksText}>7 walks</Text>
-              <Text style={styles.walksIcon}>⏰</Text>
+              <CheckCircle2 size={24} color="#ffffff" strokeWidth={1.5} />
             </View>
           </View>
 
@@ -275,27 +275,31 @@ export default function ProfileModal({
             <View style={styles.themeToggle}>
               <TouchableOpacity
                 style={[
-                  styles.themeOption,
-                  theme === 'bw' && styles.themeOptionActive,
+                  styles.themeButton,
+                  theme === 'bw' && styles.themeButtonActive,
                 ]}
                 onPress={() => onThemeChange('bw')}
               >
-                <View style={styles.themePreview}>
-                  <View style={[styles.themeCircle, { backgroundColor: '#ffffff' }]} />
-                  <View style={[styles.themeCircle, { backgroundColor: '#1a1a1a' }]} />
+                <View style={styles.themeButtonInner}>
+                  <View style={[styles.themeDot, { backgroundColor: '#ffffff' }]} />
+                  <Text style={[styles.themeButtonText, theme === 'bw' && styles.themeButtonTextActive]}>
+                    B&W
+                  </Text>
                 </View>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[
-                  styles.themeOption,
-                  theme === 'bo' && styles.themeOptionActive,
+                  styles.themeButton,
+                  theme === 'bo' && styles.themeButtonActive,
                 ]}
                 onPress={() => onThemeChange('bo')}
               >
-                <View style={styles.themePreview}>
-                  <View style={[styles.themeCircle, { backgroundColor: '#ff4400' }]} />
-                  <View style={[styles.themeCircle, { backgroundColor: '#1a1a1a' }]} />
+                <View style={styles.themeButtonInner}>
+                  <View style={[styles.themeDot, { backgroundColor: '#ff4400' }]} />
+                  <Text style={[styles.themeButtonText, theme === 'bo' && styles.themeButtonTextActive]}>
+                    B&O
+                  </Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -396,9 +400,6 @@ const styles = StyleSheet.create({
     fontFamily: 'DMMono_400Regular',
     includeFontPadding: false,
   },
-  walksIcon: {
-    fontSize: 16,
-  },
   goalSection: {
     marginBottom: 32,
     gap: 16,
@@ -469,25 +470,40 @@ const styles = StyleSheet.create({
   },
   themeToggle: {
     flexDirection: 'row',
+    gap: 12,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 4,
+  },
+  themeButton: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+  },
+  themeButtonActive: {
+    backgroundColor: '#2a2a2a',
+  },
+  themeButtonInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 8,
   },
-  themeOption: {
-    padding: 8,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: 'transparent',
+  themeDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
   },
-  themeOptionActive: {
-    borderColor: '#ffffff',
+  themeButtonText: {
+    fontSize: 14,
+    color: '#666666',
+    fontFamily: 'DMMono_400Regular',
+    includeFontPadding: false,
   },
-  themePreview: {
-    flexDirection: 'row',
-    gap: 4,
-  },
-  themeCircle: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+  themeButtonTextActive: {
+    color: '#ffffff',
   },
   closeButton: {
     position: 'absolute',
