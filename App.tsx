@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, PanResponder, Alert, Platform, Animated, Dimensions, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, Alert, Platform, Dimensions, TouchableOpacity, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Pedometer } from 'expo-sensors';
 import { useFonts, Archivo_400Regular, Archivo_600SemiBold, Archivo_700Bold } from '@expo-google-fonts/archivo';
@@ -146,84 +146,7 @@ export default function App() {
     };
   }, [isWalking, goal, isPedometerAvailable]);
   
-  const handleSwipe = (direction: 'left' | 'right') => {
-    const currentIndex = pages.indexOf(currentPage);
-    
-    if (direction === 'left' && currentIndex < pages.length - 1) {
-      const nextPage = pages[currentIndex + 1];
-      animateToPage(nextPage, currentIndex + 1);
-    } else if (direction === 'right' && currentIndex > 0) {
-      const prevPage = pages[currentIndex - 1];
-      animateToPage(prevPage, currentIndex - 1);
-    }
-  };
-
-  const animateToPage = (page: PageType, index: number) => {
-    setCurrentPage(page);
-    
-    Animated.timing(translateX, {
-      toValue: -index * screenWidth,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  useEffect(() => {
-    const index = pages.indexOf(currentPage);
-    Animated.timing(translateX, {
-      toValue: -index * screenWidth,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  }, [currentPage, screenWidth]);
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onStartShouldSetPanResponderCapture: () => false,
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
-        const isHorizontalSwipe = Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && Math.abs(gestureState.dx) > 5;
-        return isHorizontalSwipe;
-      },
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
-        const isHorizontalSwipe = Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && Math.abs(gestureState.dx) > 10;
-        return isHorizontalSwipe;
-      },
-      onPanResponderGrant: () => {},
-      onPanResponderTerminationRequest: () => false,
-      onPanResponderMove: () => {},
-      onPanResponderRelease: (evt, gestureState) => {
-        const { dx, dy, vx } = gestureState;
-        
-        const isHorizontal = Math.abs(dx) > Math.abs(dy);
-        const hasMinDistance = Math.abs(dx) > 40;
-        const hasMinVelocity = Math.abs(vx) > 0.3;
-        
-        if (isHorizontal && (hasMinDistance || hasMinVelocity)) {
-          if (dx < 0) {
-            handleSwipe('left');
-          } else {
-            handleSwipe('right');
-          }
-        } else {
-          const currentIndex = pages.indexOf(currentPage);
-          Animated.timing(translateX, {
-            toValue: -currentIndex * screenWidth,
-            duration: 200,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-      onPanResponderTerminate: () => {
-        const currentIndex = pages.indexOf(currentPage);
-        Animated.timing(translateX, {
-          toValue: -currentIndex * screenWidth,
-          duration: 200,
-          useNativeDriver: true,
-        }).start();
-      },
-    })
-  ).current;
+  // Removed swipe navigation - using only BottomNav for page changes
 
   const startWalk = async () => {
     setSteps(0);
