@@ -120,7 +120,7 @@ export default function ActivityDetailModal({ activity, goal, onClose, theme = '
           ]}
           {...panResponder.panHandlers}
         >
-          <View style={styles.modalInner}>
+          <View style={isExpanded ? styles.modalInner : styles.modalInnerCollapsed}>
             {/* Drag Handle */}
             <View style={styles.handleContainer}>
               <View style={styles.handle} />
@@ -260,10 +260,13 @@ const styles = StyleSheet.create({
     height: '85%',
   },
   modalCollapsed: {
-    maxHeight: 600,
+    // Auto height based on content
   },
   modalInner: {
     flex: 1,
+  },
+  modalInnerCollapsed: {
+    // No flex, let content define height
   },
   handleContainer: {
     paddingTop: 12,
