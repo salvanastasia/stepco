@@ -152,7 +152,7 @@ export default function ProfileModal({
           <View
             ref={containerRef}
             style={[
-              styles.contentContainer,
+              
               isDragging && styles.contentGlow,
             ]}
           >
@@ -550,8 +550,6 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  contentContainer: {
   },
   contentGlow: {
     shadowColor: 'rgba(255, 255, 255, 0.04)',
