@@ -144,35 +144,34 @@ export default function ActivityDetailModal({ activity, goal, onClose, theme = '
               <Text style={styles.date}>{formatDate(activity.date)}</Text>
 
               {/* Main Stats Card */}
-              <View style={styles.card}>
-                <View style={styles.cardBorder} />
-                <View style={styles.cardContent}>
-                  <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>Steps</Text>
-                    <Text style={[styles.statValue, { color: accentColor }]}>
-                      {formatSteps(activity.steps)}
-                    </Text>
-                  </View>
+              <View style={styles.mainCard}>
+                {/* Steps */}
+                <View style={styles.stepsSection}>
+                  <Text style={styles.stepsLabel}>STEPS</Text>
+                  <Text style={styles.stepsValue}>{formatSteps(activity.steps)}</Text>
+                  <Text style={styles.stepsUnit}>steps</Text>
+                </View>
 
-                  <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>Goal Progress</Text>
+                {/* Progress Bar */}
+                <View style={styles.progressSection}>
+                  <View style={styles.progressHeader}>
+                    <Text style={styles.progressLabel}>Goal Progress</Text>
                     <Text
                       style={[
-                        styles.statValue,
+                        styles.progressPercentage,
                         { color: isComplete ? '#4ade80' : '#999999' },
                       ]}
                     >
                       {percentage}%
                     </Text>
                   </View>
-
                   <View style={styles.progressBarContainer}>
                     <View
                       style={[
                         styles.progressBar,
                         {
                           width: `${Math.min(percentage, 100)}%`,
-                          backgroundColor: isComplete ? '#4ade80' : accentColor,
+                          backgroundColor: isComplete ? '#4ade80' : (theme === 'bo' ? '#ff4400' : '#ffffff'),
                         },
                       ]}
                     />
@@ -180,42 +179,26 @@ export default function ActivityDetailModal({ activity, goal, onClose, theme = '
                 </View>
               </View>
 
-              {/* Additional Stats */}
+              {/* Additional Stats Grid (3 columns) */}
               <View style={styles.statsGrid}>
                 <View style={styles.statCard}>
-                  <View style={styles.cardBorder} />
-                  <View style={styles.statCardContent}>
-                    <Text style={styles.statCardLabel}>Distance</Text>
-                    <Text style={styles.statCardValue}>{distanceKm} km</Text>
-                  </View>
+                  <Text style={styles.statCardLabel}>DISTANCE</Text>
+                  <Text style={styles.statCardValue}>{distanceKm}</Text>
+                  <Text style={styles.statCardUnit}>km</Text>
                 </View>
 
                 <View style={styles.statCard}>
-                  <View style={styles.cardBorder} />
-                  <View style={styles.statCardContent}>
-                    <Text style={styles.statCardLabel}>Calories</Text>
-                    <Text style={styles.statCardValue}>{calories}</Text>
-                  </View>
+                  <Text style={styles.statCardLabel}>CALORIES</Text>
+                  <Text style={styles.statCardValue}>{calories}</Text>
+                  <Text style={styles.statCardUnit}>kcal</Text>
                 </View>
 
                 <View style={styles.statCard}>
-                  <View style={styles.cardBorder} />
-                  <View style={styles.statCardContent}>
-                    <Text style={styles.statCardLabel}>Duration</Text>
-                    <Text style={styles.statCardValue}>
-                      {hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`}
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={styles.statCard}>
-                  <View style={styles.cardBorder} />
-                  <View style={styles.statCardContent}>
-                    <Text style={styles.statCardLabel}>Avg Pace</Text>
-                    <Text style={styles.statCardValue}>
-                      {(durationMinutes / parseFloat(distanceKm)).toFixed(1)} min/km
-                    </Text>
-                  </View>
+                  <Text style={styles.statCardLabel}>DURATION</Text>
+                  <Text style={styles.statCardValue}>
+                    {hours > 0 ? `${hours}:${minutes.toString().padStart(2, '0')}` : minutes}
+                  </Text>
+                  <Text style={styles.statCardUnit}>{hours > 0 ? 'hours' : 'min'}</Text>
                 </View>
               </View>
 
@@ -320,79 +303,107 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     includeFontPadding: false,
   },
-  card: {
+  mainCard: {
     backgroundColor: '#1a1a1a',
     borderRadius: 16,
+    padding: 24,
     marginBottom: 16,
-    position: 'relative',
   },
-  cardBorder: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#3a3a3a',
+  stepsSection: {
+    alignItems: 'center',
+    marginBottom: 20,
   },
-  cardContent: {
-    padding: 20,
+  stepsLabel: {
+    fontSize: 12,
+    color: '#999999',
+    fontFamily: 'JetBrainsMono_400Regular',
+    lineHeight: 18,
+    marginBottom: 8,
+    includeFontPadding: false,
   },
-  statRow: {
+  stepsValue: {
+    fontSize: 48,
+    color: '#ffffff',
+    fontFamily: 'Archivo_400Regular',
+    fontWeight: '300',
+    lineHeight: 48,
+    includeFontPadding: false,
+  },
+  stepsUnit: {
+    fontSize: 14,
+    color: '#999999',
+    fontFamily: 'JetBrainsMono_400Regular',
+    lineHeight: 21,
+    marginTop: 8,
+    includeFontPadding: false,
+  },
+  progressSection: {
+    width: '100%',
+  },
+  progressHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
-  statLabel: {
-    fontSize: 14,
+  progressLabel: {
+    fontSize: 12,
     color: '#999999',
-    fontFamily: 'DMMono_400Regular',
+    fontFamily: 'JetBrainsMono_400Regular',
+    lineHeight: 18,
     includeFontPadding: false,
   },
-  statValue: {
-    fontSize: 20,
-    fontFamily: 'JetBrainsMono_600SemiBold',
+  progressPercentage: {
+    fontSize: 14,
+    fontFamily: 'JetBrainsMono_400Regular',
+    lineHeight: 21,
     includeFontPadding: false,
   },
   progressBarContainer: {
     width: '100%',
     height: 8,
-    backgroundColor: '#0a0a0a',
-    borderRadius: 4,
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
     overflow: 'hidden',
-    marginTop: 8,
   },
   progressBar: {
     height: 8,
-    borderRadius: 4,
   },
   statsGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 12,
   },
   statCard: {
     backgroundColor: '#1a1a1a',
     borderRadius: 12,
-    width: '48%',
-    position: 'relative',
-  },
-  statCardContent: {
-    padding: 16,
+    flex: 1,
+    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    alignItems: 'center',
   },
   statCardLabel: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#999999',
-    fontFamily: 'DMMono_400Regular',
+    fontFamily: 'JetBrainsMono_400Regular',
+    lineHeight: 15,
     marginBottom: 8,
     includeFontPadding: false,
   },
   statCardValue: {
-    fontSize: 18,
+    fontSize: 20,
     color: '#ffffff',
-    fontFamily: 'JetBrainsMono_600SemiBold',
+    fontFamily: 'Archivo_400Regular',
+    fontWeight: '300',
+    lineHeight: 20,
+    marginBottom: 4,
+    includeFontPadding: false,
+  },
+  statCardUnit: {
+    fontSize: 10,
+    color: '#999999',
+    fontFamily: 'JetBrainsMono_400Regular',
+    lineHeight: 15,
     includeFontPadding: false,
   },
   expandedContent: {
