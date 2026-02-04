@@ -26,16 +26,14 @@ export default function UserProfileModal({ user, onClose, onFriendRequest, onWal
       animationType="slide"
       onRequestClose={onClose}
     >
-      <TouchableOpacity
-        style={styles.backdrop}
-        activeOpacity={1}
-        onPress={onClose}
-      >
+      <View style={styles.backdrop}>
         <TouchableOpacity
+          style={styles.backdropTouchable}
           activeOpacity={1}
-          onPress={(e) => e.stopPropagation()}
-        >
-          <View style={styles.modal}>
+          onPress={onClose}
+        />
+        
+        <View style={styles.modal}>
             <View style={styles.modalBorder} />
 
             <View style={styles.content}>
@@ -147,11 +145,18 @@ export default function UserProfileModal({ user, onClose, onFriendRequest, onWal
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingBottom: 24,
+  },
+  backdropTouchable: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modal: {
     backgroundColor: '#111111',
@@ -159,6 +164,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 393,
     position: 'relative',
+    zIndex: 10,
   },
   modalBorder: {
     position: 'absolute',
