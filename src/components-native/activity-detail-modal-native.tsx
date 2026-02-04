@@ -218,8 +218,8 @@ export default function ActivityDetailModal({ activity, goal, onClose, theme = '
                   <Text style={styles.statCardUnit}>{hours > 0 ? 'hours' : 'min'}</Text>
                 </View>
               </View>
-
-            </ScrollView>
+              </ScrollView>
+            )}
           </View>
         </Animated.View>
       </View>
