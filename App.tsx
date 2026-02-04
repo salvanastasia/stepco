@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, StyleSheet, Alert, Platform, TouchableOpacity, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Pedometer } from 'expo-sensors';
@@ -44,6 +45,7 @@ export default function App() {
   const [theme, setTheme] = useState<'bw' | 'bo'>('bw');
   const [showFriendInvite, setShowFriendInvite] = useState(false);
   const [showFriendFinding, setShowFriendFinding] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [walkHistory, setWalkHistory] = useState<StepRecord[]>([
     { date: '2026-02-03', steps: 6847 },
     { date: '2026-02-02', steps: 12453 },
@@ -144,6 +146,40 @@ export default function App() {
     };
   }, [isWalking, goal, isPedometerAvailable]);
   
+
+  // Load saved profile image on mount
+  useEffect(() => {
+    const loadProfileImage = async () => {
+      try {
+        const savedImage = await AsyncStorage.getItem('profileImage');
+        if (savedImage) {
+          setProfileImage(savedImage);
+        }
+      } catch (error) {
+        console.error('Error loading profile image:', error);
+      }
+    };
+    
+    loadProfileImage();
+  }, []);
+
+  // Save profile image when it changes
+  useEffect(() => {
+    const saveProfileImage = async () => {
+      try {
+        if (profileImage) {
+          await AsyncStorage.setItem('profileImage', profileImage);
+        }
+      } catch (error) {
+        console.error('Error saving profile image:', error);
+      }
+    };
+    
+    if (profileImage !== null) {
+      saveProfileImage();
+    }
+  }, [profileImage]);
+
   // Removed swipe navigation - using only BottomNav for page changes
 
   const startWalk = async () => {
@@ -292,6 +328,8 @@ export default function App() {
             onGoalChange={handleGoalChange} 
             theme={theme}
             onThemeChange={setTheme}
+            profileImage={profileImage}
+            onProfileImageChange={setProfileImage}
           />
         </View>
       )}
@@ -300,6 +338,7 @@ export default function App() {
         currentPage={currentPage} 
         onPageChange={setCurrentPage} 
         theme={theme}
+        profileImage={profileImage}
       />
 
       {showCompletionModal && (

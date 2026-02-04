@@ -15,6 +15,8 @@ interface ProfileViewProps {
   onGoalChange: (goal: number) => void;
   theme?: 'bw' | 'bo';
   onThemeChange?: (theme: 'bw' | 'bo') => void;
+  profileImage?: string | null;
+  onProfileImageChange?: (image: string) => void;
 }
 
 export default function ProfileView({
@@ -23,6 +25,8 @@ export default function ProfileView({
   onGoalChange,
   theme = 'bw',
   onThemeChange,
+  profileImage,
+  onProfileImageChange,
 }: ProfileViewProps) {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<StepRecord | null>(null);

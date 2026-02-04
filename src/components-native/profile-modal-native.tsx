@@ -12,6 +12,8 @@ interface ProfileModalProps {
   onGoalChange: (goal: number) => void;
   theme: 'bw' | 'bo';
   onThemeChange: (theme: 'bw' | 'bo') => void;
+  profileImage?: string | null;
+  onProfileImageChange?: (image: string) => void;
 }
 
 export default function ProfileModal({
@@ -20,17 +22,26 @@ export default function ProfileModal({
   initialGoal,
   onGoalChange,
   theme,
-  onThemeChange
+  onThemeChange,
+  profileImage: externalProfileImage,
+  onProfileImageChange
 }: ProfileModalProps) {
   const [goal, setGoal] = useState(initialGoal);
   const [isDragging, setIsDragging] = useState(false);
   const [glowPosition, setGlowPosition] = useState({ x: 50, y: 50 });
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(externalProfileImage || null);
   const glowOpacity = useRef(new Animated.Value(0)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
   const modalTranslateY = useRef(new Animated.Value(300)).current;
   const themeSliderPosition = useRef(new Animated.Value(theme === 'bw' ? 0 : 82)).current;
   const containerRef = useRef<View>(null);
+
+  // Sync with external profileImage
+  useEffect(() => {
+    if (externalProfileImage !== undefined) {
+      setProfileImage(externalProfileImage);
+    }
+  }, [externalProfileImage]);
 
   // Sequential entry animation
   useEffect(() => {
@@ -83,7 +94,11 @@ export default function ProfileModal({
     });
 
     if (!result.canceled && result.assets[0]) {
-      setProfileImage(result.assets[0].uri);
+      const newImageUri = result.assets[0].uri;
+      setProfileImage(newImageUri);
+      if (onProfileImageChange) {
+        onProfileImageChange(newImageUri);
+      }
     }
   };
 

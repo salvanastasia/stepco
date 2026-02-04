@@ -9,6 +9,7 @@ interface BottomNavProps {
   onPageChange: (page: PageType) => void;
   theme?: 'bw' | 'bo';
   onProfilePress?: () => void;
+  profileImage?: string | null;
 }
 
 const getIcon = (page: PageType) => {
@@ -24,7 +25,7 @@ const getIcon = (page: PageType) => {
   }
 };
 
-export default function BottomNav({ currentPage, onPageChange, theme = 'bw', onProfilePress }: BottomNavProps) {
+export default function BottomNav({ currentPage, onPageChange, theme = 'bw', onProfilePress, profileImage }: BottomNavProps) {
   const pages: PageType[] = ['home', 'map', 'social', 'profile'];
   const accentColor = theme === 'bo' ? '#ff4400' : '#ffffff';
   
@@ -57,7 +58,7 @@ export default function BottomNav({ currentPage, onPageChange, theme = 'bw', onP
                   isActive && { borderColor: accentColor, borderWidth: 2 }
                 ]}>
                   <Image
-                    source={require('../assets/5e57bdbeef9424b6821c727c30e788b8e31d6a71.png')}
+                    source={profileImage ? { uri: profileImage } : require('../assets/5e57bdbeef9424b6821c727c30e788b8e31d6a71.png')}
                     style={styles.profileImage}
                   />
                 </View>
